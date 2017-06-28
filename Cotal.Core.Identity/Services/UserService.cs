@@ -14,7 +14,7 @@ namespace Cotal.Core.Identity.Services
         Task<IdentityResult> CreateUser(AppUser user, string password);
         PasswordVerificationResult VerifyHashedPassword(AppUser user, string password);
         Task<IList<Claim>> GetClaims(AppUser user);
-        Task<bool> Login(LoginViewModel model);
+        Task<SignInResult> Login(LoginViewModel model);
     }
     public class UserService : IUserService
     {
@@ -49,10 +49,10 @@ namespace Cotal.Core.Identity.Services
             return await _userManager.GetClaimsAsync(user);
         }
 
-        public async Task<bool> Login(LoginViewModel model)
+        public async Task<SignInResult> Login(LoginViewModel model)
         {
             var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
-            return result.Succeeded;
+            return result;
         }
     }
 }
