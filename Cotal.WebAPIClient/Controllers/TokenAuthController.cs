@@ -13,6 +13,7 @@ using Cotal.Core.Identity.Services;
 using Cotal.WebAPIClient.Auth;
 using Cotal_WebAPIClient.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -31,27 +32,38 @@ namespace Cotal.WebAPIClient.Controllers
 
         [HttpPost]
         public async Task<string> GetAuthToken([FromBody]LoginViewModel model)
-        {
-            var signInResult = await _userService.Login(model);
-
-            if (signInResult.Succeeded)
+        {                 
+            var signInResult = await _userService.GetUserByUsername(model.UserName);   
+            if (signInResult!= null)
             {
-                var existUser = await _userService.GetUserByUsername(model.UserName);
-                var requestAt = DateTime.Now;
-                var expiresIn = requestAt + TokenAuthOption.ExpiresSpan;
-                var token = GenerateToken(existUser, expiresIn);
-
-                return JsonConvert.SerializeObject(new RequestResult
+                var verify =  _userService.VerifyHashedPassword(signInResult, model.Password);
+                if (verify == PasswordVerificationResult.Success)
                 {
-                    State = RequestState.Success,
-                    Data = new
+                    var requestAt = DateTime.Now;
+                    var expiresIn = requestAt + TokenAuthOption.ExpiresSpan;
+                    var token = GenerateToken(signInResult, expiresIn);
+
+                    return   JsonConvert.SerializeObject(new RequestResult
                     {
-                        requertAt = requestAt,
-                        expiresIn = TokenAuthOption.ExpiresSpan.TotalSeconds,
-                        tokeyType = TokenAuthOption.TokenType,
-                        accessToken = token
-                    }
-                });
+                        State = RequestState.Success,
+                        Data = new
+                        {
+                            requertAt = requestAt,
+                            expiresIn = TokenAuthOption.ExpiresSpan.TotalSeconds,
+                            tokeyType = TokenAuthOption.TokenType,
+                            accessToken = token
+                        }
+                    });
+                }
+                else
+                {
+                    return JsonConvert.SerializeObject(new RequestResult
+                    {
+                        State = RequestState.Failed,
+                        Msg = "Username or password is invalid"
+                    });
+                }
+               
             }
             else
             {
