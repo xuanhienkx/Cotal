@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cotal.App.Data;
 using Cotal.App.Data.Contexts;
 using Cotal.Core.Identity;
 using Cotal.Core.Identity.Data;
@@ -71,9 +72,9 @@ namespace Cotal.Web
     {
       // Adding dependencies from another layers (isolated from Presentation)
       IdentityInjectorBootStrapper.RegisterServices(services);
-      services.AddScoped<IDbCotalInitializer, DbCotalInitializer>();
+      CotalInjectorBootStrapper.RegisterServices(services);
     }
-    private static readonly string secretKey = "mysupersecret_secretkey!123";
+    private static readonly string secretKey = "cotalsupersecret_secretkey!123";
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
     {
