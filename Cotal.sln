@@ -9,19 +9,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{0DD37357-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{DBD55AA1-E264-45DC-BEEA-DFDB1BD27435}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotal.Core.Identity", "Cotal.Core.Identity\Cotal.Core.Identity.csproj", "{6510C24A-F525-415D-858F-AAC0F545D0FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cotal.Core.Identity", "Cotal.Core.Identity\Cotal.Core.Identity.csproj", "{6510C24A-F525-415D-858F-AAC0F545D0FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotal.Core.Domain", "Cotal.Core.Domain\Cotal.Core.Domain.csproj", "{569CF203-6ED5-4009-80BF-253B7BE271A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cotal.Core.Domain", "Cotal.Core.Domain\Cotal.Core.Domain.csproj", "{569CF203-6ED5-4009-80BF-253B7BE271A3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cotal.Core.InfacBase", "Cotal.Core.InfacBase\Cotal.Core.InfacBase.csproj", "{9B2DC80E-DD74-4133-8E24-2B504BB6FFEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotal.App.Data", "Cotal.App.Data\Cotal.App.Data.csproj", "{971BD5F6-8CBB-42A6-9E04-C978BA021B1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cotal.App.Data", "Cotal.App.Data\Cotal.App.Data.csproj", "{971BD5F6-8CBB-42A6-9E04-C978BA021B1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotal.App.Model", "Cotal.App.Model\Cotal.App.Model.csproj", "{D74B102F-D031-4FC1-90D2-A35E53ED6C16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cotal.App.Model", "Cotal.App.Model\Cotal.App.Model.csproj", "{D74B102F-D031-4FC1-90D2-A35E53ED6C16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotal.Core.Common", "Cotal.Core.Common\Cotal.Core.Common.csproj", "{464CBEF9-B388-43ED-BA51-35C48714DC50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cotal.Core.Common", "Cotal.Core.Common\Cotal.Core.Common.csproj", "{464CBEF9-B388-43ED-BA51-35C48714DC50}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cotal.Web", "Cotal.Web\Cotal.Web.csproj", "{E0980CFC-507C-4773-95B6-CB3DB2D722FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cotal.App.Data.Test", "Cotal.App.Data.Test\Cotal.App.Data.Test.csproj", "{C40B7DC8-A760-404F-AB7E-277EC03BC6C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cotal.App.Business", "Cotal.App.Business\Cotal.App.Business.csproj", "{AF6F7C02-B3E1-42BB-A39A-DEC75D3649FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +61,14 @@ Global
 		{E0980CFC-507C-4773-95B6-CB3DB2D722FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0980CFC-507C-4773-95B6-CB3DB2D722FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0980CFC-507C-4773-95B6-CB3DB2D722FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C40B7DC8-A760-404F-AB7E-277EC03BC6C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C40B7DC8-A760-404F-AB7E-277EC03BC6C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C40B7DC8-A760-404F-AB7E-277EC03BC6C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C40B7DC8-A760-404F-AB7E-277EC03BC6C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF6F7C02-B3E1-42BB-A39A-DEC75D3649FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF6F7C02-B3E1-42BB-A39A-DEC75D3649FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF6F7C02-B3E1-42BB-A39A-DEC75D3649FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF6F7C02-B3E1-42BB-A39A-DEC75D3649FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +81,7 @@ Global
 		{D74B102F-D031-4FC1-90D2-A35E53ED6C16} = {E7B66FA9-C445-463A-86E2-18F87C570BC0}
 		{464CBEF9-B388-43ED-BA51-35C48714DC50} = {0DD37357-CBB5-4C43-89E5-A91C61009C25}
 		{E0980CFC-507C-4773-95B6-CB3DB2D722FD} = {E7B66FA9-C445-463A-86E2-18F87C570BC0}
+		{C40B7DC8-A760-404F-AB7E-277EC03BC6C9} = {DBD55AA1-E264-45DC-BEEA-DFDB1BD27435}
+		{AF6F7C02-B3E1-42BB-A39A-DEC75D3649FA} = {E7B66FA9-C445-463A-86E2-18F87C570BC0}
 	EndGlobalSection
 EndGlobal

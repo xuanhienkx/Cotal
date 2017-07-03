@@ -162,7 +162,7 @@ namespace Cotal.App.Data.Contexts
                     context.Pages.Add(page);
                     context.SaveChanges();
                 }
-                catch (Exception ex)
+                catch //(Exception ex)
                 {
                     /* foreach (var eve in ex.EntityValidationErrors)
                      {

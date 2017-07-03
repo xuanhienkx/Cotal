@@ -40,5 +40,7 @@ namespace Cotal.Core.InfacBase.Uow
             var uow = new UnitOfWork(_context, _serviceProvider);
             return uow;
         }
+
+        public DbContext Context => (DbContext)_serviceProvider.GetService(typeof(IEntityContext));
     }
 }

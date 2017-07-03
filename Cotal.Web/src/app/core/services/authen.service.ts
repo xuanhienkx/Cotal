@@ -1,32 +1,31 @@
-﻿import { Injectable, Inject } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions, Response } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { LoggedInUser } from "app/core/models/LoggedInUser";
 import { SystemConstants } from "app/core/common/system.constants";
-
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class AuthenService {
-  @Inject('ORIGIN_URL') originUrl: string;
   constructor(private _http: Http) {
-    localStorage.removeItem(SystemConstants.CURRENT_USER);
   }
   login(userName: string, password: string) {
 
     let headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
     let options = new RequestOptions({ headers: headers });
-    let url =  '/token';
-     console.log(url)
-     let body = "username=" + encodeURIComponent(userName) +
-      "&password=" + encodeURIComponent(password)  
+    let url = '/token';
+    let body = "username=" +
+      encodeURIComponent(userName) +
+      "&password=" +
+      encodeURIComponent(password);
 
-    return this._http.post(url, body,options ).map((response: Response) => {
-      console.log(response)
-      let user: LoggedInUser = response.json();
+    return this._http.post(url, body, options).map((response: Response) => {
+      let user: LoggedInUser = response.json(); 
       if (user && user.access_token) {
         localStorage.setItem(SystemConstants.CURRENT_USER, JSON.stringify(user));
       }
+
     });
   }
   logout() {
@@ -44,9 +43,8 @@ export class AuthenService {
     let user: LoggedInUser;
     if (this.isUserAuthenticated()) {
       var userData = JSON.parse(localStorage.getItem(SystemConstants.CURRENT_USER));
-      user = new LoggedInUser(userData.access_token,
-        userData.username,
-        userData.expiresIn);
+      user = new LoggedInUser(userData.access_token, userData.UserName, userData.ExpiresIn,
+        userData.FullName, userData.Email, userData.Avatar, userData.Permission, userData.Roles);
     }
     else
       user = null;

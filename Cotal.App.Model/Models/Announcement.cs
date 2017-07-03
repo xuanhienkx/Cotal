@@ -21,10 +21,8 @@ namespace Cotal.App.Model.Models
 
         public string Content { set; get; }
 
-        public DateTime CreatedDate { get; set; }
-
-        [StringLength(128)]
-        public string UserId { set; get; }    
+        public DateTime CreatedDate { get; set; }   
+        public int UserId { set; get; }    
         public string UserName { get; set; }
 
         public bool Status { get; set; }

@@ -56,7 +56,7 @@ export class TopMenuComponent implements OnInit {
 
   markAsRead(id: number) {
     var body = { announId: id };
-    this._dataService.get('/api/Announcement/markAsRead?announId=' + id.toString()).subscribe((response: any) => {
+    this._dataService.get('/api/Announcement/MarkAsRead?announId=' + id.toString()).subscribe((response: any) => {
       if (response) {
         this.loadAnnouncements();
       }
@@ -64,7 +64,7 @@ export class TopMenuComponent implements OnInit {
   }
 
   private loadAnnouncements() {
-    this._dataService.get('/api/Announcement/getTopMyAnnouncement').subscribe((response: any) => {
+    this._dataService.get('/api/Announcement/GetTopMyAnnouncement').subscribe((response: any) => {
       this.announcements = [];
       for (let item of response) {
         item.CreatedDate = moment(item.CreatedDate).fromNow();

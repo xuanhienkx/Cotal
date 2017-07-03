@@ -109,8 +109,7 @@ namespace Cotal.Core.InfacBase.Repositories
 
         public virtual IEnumerable<TEntity> QueryPage(int startRow, int pageLength, Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IQueryable<TEntity>> includes = null)
         {
-            if (orderBy == null) orderBy = DefaultOrderBy.Expression;
-
+            if (orderBy == null) orderBy = DefaultOrderBy.Expression;   
             var result = QueryDb(filter, orderBy, includes);
             return result.Skip(startRow).Take(pageLength).ToList();
         }
@@ -123,10 +122,10 @@ namespace Cotal.Core.InfacBase.Repositories
             return await result.Skip(startRow).Take(pageLength).ToListAsync();
         }
 
-        public virtual void Add(TEntity entity)
+        public virtual TEntity Add(TEntity entity)
         {
             if (entity == null) throw new InvalidOperationException("Unable to add a null entity to the repository.");
-            Context.Set<TEntity>().Add(entity);
+            return Context.Set<TEntity>().Add(entity).Entity;
 
         }
 
@@ -148,7 +147,14 @@ namespace Cotal.Core.InfacBase.Repositories
             this.Remove(entity);
         }
 
-        public virtual bool Any(Expression<Func<TEntity, bool>> filter = null)
+      public void RemoveMulti(Expression<Func<TEntity, bool>> filter)
+      {
+      IEnumerable<TEntity> objects = Context.Set<TEntity>().Where<TEntity>(filter).AsEnumerable();
+        foreach (TEntity obj in objects)
+          Context.Set<TEntity>().Remove(obj);
+    }
+
+      public virtual bool Any(Expression<Func<TEntity, bool>> filter = null)
         {
             IQueryable<TEntity> query = Context.Set<TEntity>();
 

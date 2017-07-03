@@ -1,38 +1,69 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
-using Cotal.Core.Identity.Models.AccountViewModels;
+using System.Linq;
+using System.Security.Principal;
+using AutoMapper;
+using Cotal.App.Business.Services;
+using Cotal.App.Business.ViewModels.System;
+using Cotal.App.Model.Models;
 using Cotal.Core.Identity.Services;
+using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
+using Cotal.App.Business.Constants;
 
 namespace Cotal.Web.Authen
-{
+{  /// <summary>
+   /// Token generator middleware component which is added to an HTTP pipeline.
+   /// This class is not created by application code directly,
+   /// instead it is added by calling the <see cref="TokenProviderAppBuilderExtensions.UseSimpleTokenProvider(Microsoft.AspNetCore.Builder.IApplicationBuilder, TokenProviderOptions)"/>
+   /// extension method.
+   /// </summary>
   public class TokenProviderMiddleware
   {
     private readonly RequestDelegate _next;
     private readonly TokenProviderOptions _options;
-    private IUserService _userService;
-
+    private readonly ILogger _logger;
+    private readonly JsonSerializerSettings _serializerSettings;
+    private readonly ILoginService _loginService;
+    private readonly IUserService _userService;
     public TokenProviderMiddleware(
       RequestDelegate next,
-      IOptions<TokenProviderOptions> options, IUserService userService)
+      IOptions<TokenProviderOptions> options,
+      ILoggerFactory loggerFactory, ILoginService loginService, IUserService userService)
     {
       _next = next;
+      _loginService = loginService;
       _userService = userService;
+      _logger = loggerFactory.CreateLogger<TokenProviderMiddleware>();
+
       _options = options.Value;
+      ThrowIfInvalidOptions(_options);
+
+      _serializerSettings = new JsonSerializerSettings
+      {
+        Formatting = Formatting.Indented
+      };
     }
 
     public Task Invoke(HttpContext context)
     {
       // If the request path doesn't match, skip
+
+
       if (!context.Request.Path.Equals(_options.Path, StringComparison.Ordinal))
       {
+        //var uname = context.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;   
+        //_logger.LogInformation(uname);
         return _next(context);
       }
-
       // Request must be POST with Content-Type: application/x-www-form-urlencoded
       if (!context.Request.Method.Equals("POST")
           || !context.Request.HasFormContentType)
@@ -41,14 +72,17 @@ namespace Cotal.Web.Authen
         return context.Response.WriteAsync("Bad request.");
       }
 
+      _logger.LogInformation("Handling request: " + context.Request.Path);
+
       return GenerateToken(context);
     }
+
     private async Task GenerateToken(HttpContext context)
     {
       var username = context.Request.Form["username"];
       var password = context.Request.Form["password"];
 
-      var identity = await GetIdentity(username, password);
+      var identity = await _options.IdentityResolver(username, password, _userService);
       if (identity == null)
       {
         context.Response.StatusCode = 400;
@@ -58,13 +92,15 @@ namespace Cotal.Web.Authen
 
       var now = DateTime.UtcNow;
 
-      // Specifically add the jti (random nonce), iat (issued timestamp), and sub (subject/user) claims.
+      // Specifically add the jti (nonce), iat (issued timestamp), and sub (subject/user) claims.
       // You can add other claims here, if you want:
+      var user = _loginService.CurrenrUser(username);            
       var claims = new Claim[]
       {
         new Claim(JwtRegisteredClaimNames.Sub, username),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(JwtRegisteredClaimNames.Iat, now.ToFileTimeUtc().ToString(), ClaimValueTypes.Integer64)
+        new Claim(JwtRegisteredClaimNames.Jti, await _options.NonceGenerator()),
+        new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
+        new Claim(Constants.CURRENT_USER, JsonConvert.SerializeObject(user))  
       };
 
       // Create the JWT and write it to a string
@@ -76,29 +112,68 @@ namespace Cotal.Web.Authen
         expires: now.Add(_options.Expiration),
         signingCredentials: _options.SigningCredentials);
       var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
       var response = new
       {
+        Id = user.Id,
+        UserName = user.UserName,
+        FullName = user.FullName,
+        Email = user.Email,
+        Avatar = user.Avatar,
         access_token = encodedJwt,
-        expires_in = (int)_options.Expiration.TotalSeconds
+        ExpiresIn = (int)_options.Expiration.TotalSeconds,
+        Permissions = JsonConvert.SerializeObject(user.Permissions),
+        Roles = JsonConvert.SerializeObject(user.Roles.Select(x=>x.Name).ToList())
+
       };
 
       // Serialize and return the response
       context.Response.ContentType = "application/json";
-      await context.Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
+      await context.Response.WriteAsync(JsonConvert.SerializeObject(response, _serializerSettings));
     }
-    private async Task<ClaimsIdentity> GetIdentity(string username, string password)
-    {
 
-      var reult = await _userService.Login(username, password);
-      // DON'T do this in production, obviously!
-      if (reult)
+    private static void ThrowIfInvalidOptions(TokenProviderOptions options)
+    {
+      if (string.IsNullOrEmpty(options.Path))
       {
-        return await Task.FromResult(new ClaimsIdentity(new System.Security.Principal.GenericIdentity(username, "Token"), new Claim[] { }));
+        throw new ArgumentNullException(nameof(TokenProviderOptions.Path));
       }
 
-      // Credentials are invalid, or account doesn't exist
-      return await Task.FromResult<ClaimsIdentity>(null);
+      if (string.IsNullOrEmpty(options.Issuer))
+      {
+        throw new ArgumentNullException(nameof(TokenProviderOptions.Issuer));
+      }
+
+      if (string.IsNullOrEmpty(options.Audience))
+      {
+        throw new ArgumentNullException(nameof(TokenProviderOptions.Audience));
+      }
+
+      if (options.Expiration == TimeSpan.Zero)
+      {
+        throw new ArgumentException("Must be a non-zero TimeSpan.", nameof(TokenProviderOptions.Expiration));
+      }
+
+      if (options.IdentityResolver == null)
+      {
+        throw new ArgumentNullException(nameof(TokenProviderOptions.IdentityResolver));
+      }
+
+      if (options.SigningCredentials == null)
+      {
+        throw new ArgumentNullException(nameof(TokenProviderOptions.SigningCredentials));
+      }
+
+      if (options.NonceGenerator == null)
+      {
+        throw new ArgumentNullException(nameof(TokenProviderOptions.NonceGenerator));
+      }
     }
+
+    /// <summary>
+    /// Get this datetime as a Unix epoch timestamp (seconds since Jan 1, 1970, midnight UTC).
+    /// </summary>
+    /// <param name="date">The date to convert.</param>
+    /// <returns>Seconds since Unix epoch.</returns>
+    public static long ToUnixEpochDate(DateTime date) => new DateTimeOffset(date).ToUniversalTime().ToUnixTimeSeconds();
   }
 }

@@ -31,8 +31,7 @@ namespace Cotal.App.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(250);
 
-                    b.Property<string>("UserId")
-                        .HasMaxLength(128);
+                    b.Property<int>("UserId");
 
                     b.Property<string>("UserName");
 

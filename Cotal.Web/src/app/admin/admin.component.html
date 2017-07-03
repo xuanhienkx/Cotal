@@ -11,11 +11,11 @@
         <!-- menu profile quick info -->
         <div class="profile">
           <div class="profile_pic">
-            <img src="{{user.avatar}}" alt="..." class="img-circle profile_img">
+            <img [src]="baseFolder + user.Avatar"  alt="..." class="img-circle profile_img">
           </div>
           <div class="profile_info">
             <span>Chào mừng,</span>
-            <h2>{{user.fullName}}</h2>
+            <h2>{{user.FullName}}</h2>
           </div>
         </div>
         <!-- /menu profile quick info -->
@@ -45,7 +45,7 @@
     </div>
 
     <!-- top navigation -->
-    <app-top-menu></app-top-menu>
+   <!-- <app-top-menu></app-top-menu>-->
     <!-- /top navigation -->
     <!-- page content -->
     <div class="right_col" role="main">

@@ -48,7 +48,7 @@ namespace Cotal.Core.Common
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch  
             {
                 return false;
             }
