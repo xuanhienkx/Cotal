@@ -3,29 +3,27 @@ using Cotal.Core.InfacBase.Uow;
 
 namespace Cotal.App.Business.Services
 {
-    public interface IErrorService
-    {
-        Error Create(Error error);
+  public interface IErrorService
+  {
+    Error Create(Error error);
 
-        int Save();
+    int Save();
+  }
+
+  public class ErrorService : ServiceBace<Error, int>, IErrorService
+  {
+    public ErrorService(IUowProvider uowProvider) : base(uowProvider)
+    {
     }
 
-    public class ErrorService : ServiceBace<Error, int>, IErrorService
+    public Error Create(Error error)
     {
-        public ErrorService(IUowProvider uowProvider) : base(uowProvider)
-        {
-        }
-
-        public Error Create(Error error)
-        {
-            return Repository.Add(error);
-        }
-
-        public int Save()
-        {
-            return UnitOfWork.SaveChanges();
-        }
-
-
+      return Repository.Add(error);
     }
+
+    public int Save()
+    {
+      return UnitOfWork.SaveChanges();
+    }
+  }
 }

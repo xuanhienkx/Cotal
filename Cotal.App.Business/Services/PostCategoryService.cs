@@ -20,6 +20,7 @@ namespace Cotal.App.Business.Services
 
     void Save();
   }
+
   public class PostCategoryService : ServiceBace<PostCategory, int>, IPostCategoryService
   {
     public PostCategoryService(IUowProvider uowProvider) : base(uowProvider)
@@ -53,7 +54,7 @@ namespace Cotal.App.Business.Services
 
     public PostCategory GetById(int id)
     {
-      return Repository.Get(id);    
+      return Repository.Get(id);
     }
 
     public void Save()

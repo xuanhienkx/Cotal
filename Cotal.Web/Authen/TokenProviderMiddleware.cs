@@ -1,39 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Principal;
-using AutoMapper;
-using Cotal.App.Business.Services;
-using Cotal.App.Business.ViewModels.System;
-using Cotal.App.Model.Models;
-using Cotal.Core.Identity.Services;
-using Microsoft.AspNetCore.Http.Authentication;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Cotal.App.Business.Constants;
+using Cotal.App.Business.Services;
+using Cotal.Core.Identity.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace Cotal.Web.Authen
-{  /// <summary>
-   /// Token generator middleware component which is added to an HTTP pipeline.
-   /// This class is not created by application code directly,
-   /// instead it is added by calling the <see cref="TokenProviderAppBuilderExtensions.UseSimpleTokenProvider(Microsoft.AspNetCore.Builder.IApplicationBuilder, TokenProviderOptions)"/>
-   /// extension method.
-   /// </summary>
+{
+  /// <summary>
+  ///   Token generator middleware component which is added to an HTTP pipeline.
+  ///   This class is not created by application code directly,
+  ///   instead it is added by calling the
+  ///   <see
+  ///     cref="TokenProviderAppBuilderExtensions.UseSimpleTokenProvider(Microsoft.AspNetCore.Builder.IApplicationBuilder, TokenProviderOptions)" />
+  ///   extension method.
+  /// </summary>
   public class TokenProviderMiddleware
   {
+    private readonly ILogger _logger;
+    private readonly ILoginService _loginService;
     private readonly RequestDelegate _next;
     private readonly TokenProviderOptions _options;
-    private readonly ILogger _logger;
     private readonly JsonSerializerSettings _serializerSettings;
-    private readonly ILoginService _loginService;
     private readonly IUserService _userService;
+
     public TokenProviderMiddleware(
       RequestDelegate next,
       IOptions<TokenProviderOptions> options,
@@ -59,11 +55,7 @@ namespace Cotal.Web.Authen
 
 
       if (!context.Request.Path.Equals(_options.Path, StringComparison.Ordinal))
-      {
-        //var uname = context.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;   
-        //_logger.LogInformation(uname);
         return _next(context);
-      }
       // Request must be POST with Content-Type: application/x-www-form-urlencoded
       if (!context.Request.Method.Equals("POST")
           || !context.Request.HasFormContentType)
@@ -94,36 +86,35 @@ namespace Cotal.Web.Authen
 
       // Specifically add the jti (nonce), iat (issued timestamp), and sub (subject/user) claims.
       // You can add other claims here, if you want:
-      var user = _loginService.CurrenrUser(username);            
-      var claims = new Claim[]
+      var user = _loginService.CurrenrUser(username);
+      var claims = new[]
       {
         new Claim(JwtRegisteredClaimNames.Sub, username),
         new Claim(JwtRegisteredClaimNames.Jti, await _options.NonceGenerator()),
         new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
-        new Claim(Constants.CURRENT_USER, JsonConvert.SerializeObject(user))  
+        new Claim(Constants.CURRENT_USER, JsonConvert.SerializeObject(user))
       };
 
       // Create the JWT and write it to a string
       var jwt = new JwtSecurityToken(
-        issuer: _options.Issuer,
-        audience: _options.Audience,
-        claims: claims,
-        notBefore: now,
-        expires: now.Add(_options.Expiration),
-        signingCredentials: _options.SigningCredentials);
+        _options.Issuer,
+        _options.Audience,
+        claims,
+        now,
+        now.Add(_options.Expiration),
+        _options.SigningCredentials);
       var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
       var response = new
       {
-        Id = user.Id,
-        UserName = user.UserName,
-        FullName = user.FullName,
-        Email = user.Email,
-        Avatar = user.Avatar,
+        user.Id,
+        user.UserName,
+        user.FullName,
+        user.Email,
+        user.Avatar,
         access_token = encodedJwt,
-        ExpiresIn = (int)_options.Expiration.TotalSeconds,
+        ExpiresIn = (int) _options.Expiration.TotalSeconds,
         Permissions = JsonConvert.SerializeObject(user.Permissions),
-        Roles = JsonConvert.SerializeObject(user.Roles.Select(x=>x.Name).ToList())
-
+        Roles = JsonConvert.SerializeObject(user.Roles.Select(x => x.Name).ToList())
       };
 
       // Serialize and return the response
@@ -134,46 +125,35 @@ namespace Cotal.Web.Authen
     private static void ThrowIfInvalidOptions(TokenProviderOptions options)
     {
       if (string.IsNullOrEmpty(options.Path))
-      {
         throw new ArgumentNullException(nameof(TokenProviderOptions.Path));
-      }
 
       if (string.IsNullOrEmpty(options.Issuer))
-      {
         throw new ArgumentNullException(nameof(TokenProviderOptions.Issuer));
-      }
 
       if (string.IsNullOrEmpty(options.Audience))
-      {
         throw new ArgumentNullException(nameof(TokenProviderOptions.Audience));
-      }
 
       if (options.Expiration == TimeSpan.Zero)
-      {
         throw new ArgumentException("Must be a non-zero TimeSpan.", nameof(TokenProviderOptions.Expiration));
-      }
 
       if (options.IdentityResolver == null)
-      {
         throw new ArgumentNullException(nameof(TokenProviderOptions.IdentityResolver));
-      }
 
       if (options.SigningCredentials == null)
-      {
         throw new ArgumentNullException(nameof(TokenProviderOptions.SigningCredentials));
-      }
 
       if (options.NonceGenerator == null)
-      {
         throw new ArgumentNullException(nameof(TokenProviderOptions.NonceGenerator));
-      }
     }
 
     /// <summary>
-    /// Get this datetime as a Unix epoch timestamp (seconds since Jan 1, 1970, midnight UTC).
+    ///   Get this datetime as a Unix epoch timestamp (seconds since Jan 1, 1970, midnight UTC).
     /// </summary>
     /// <param name="date">The date to convert.</param>
     /// <returns>Seconds since Unix epoch.</returns>
-    public static long ToUnixEpochDate(DateTime date) => new DateTimeOffset(date).ToUniversalTime().ToUnixTimeSeconds();
+    public static long ToUnixEpochDate(DateTime date)
+    {
+      return new DateTimeOffset(date).ToUniversalTime().ToUnixTimeSeconds();
+    }
   }
 }

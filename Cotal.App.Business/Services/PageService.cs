@@ -11,6 +11,7 @@ namespace Cotal.App.Business.Services
     void Update(Page page);
     void Save();
   }
+
   public class PageService : ServiceBace<Page, int>, IPageService
   {
     public PageService(IUowProvider uowProvider) : base(uowProvider)
@@ -19,7 +20,7 @@ namespace Cotal.App.Business.Services
 
     public Page GetByAlias(string alias)
     {
-      return Enumerable.FirstOrDefault<Page>(Repository.Query(x => x.Alias == alias));
+      return Repository.Query(x => x.Alias == alias).FirstOrDefault();
     }
 
     public Page Create(Page page)

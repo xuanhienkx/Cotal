@@ -6,10 +6,7 @@ namespace Cotal.App.Business.Mappings
   {
     public static MapperConfiguration RegisterMappings()
     {
-      return new MapperConfiguration(cfg =>
-      {
-        cfg.AddProfile(new ViewModelMappingProfile());
-      });
+      return new MapperConfiguration(cfg => { cfg.AddProfile(new ViewModelMappingProfile()); });
     }
   }
 }

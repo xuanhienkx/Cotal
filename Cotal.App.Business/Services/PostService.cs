@@ -26,6 +26,7 @@ namespace Cotal.App.Business.Services
 
     void Save();
   }
+
   public class PostService : ServiceBace<Post, int>, IPostService
   {
     public PostService(IUowProvider uowProvider) : base(uowProvider)
@@ -51,19 +52,22 @@ namespace Cotal.App.Business.Services
 
     public IEnumerable<Post> GetAll()
     {
-      return Repository.GetAll(x => x.OrderByDescending(p => p.CreatedDate), posts => posts.Include(p => p.PostCategory));
+      return Repository.GetAll(x => x.OrderByDescending(p => p.CreatedDate),
+        posts => posts.Include(p => p.PostCategory));
     }
 
     public IEnumerable<Post> GetAllPaging(int page, int pageSize, out int totalRow)
     {
       totalRow = Repository.Count();
-      return Repository.QueryPage(page, pageSize, post => post.Id != 0, null, posts => posts.Include(p => p.PostCategory)).ToList();
+      return Repository.QueryPage(page, pageSize, post => post.Id != 0, null,
+        posts => posts.Include(p => p.PostCategory)).ToList();
     }
 
     public IEnumerable<Post> GetAllByCategoryPaging(int categoryId, int page, int pageSize, out int totalRow)
     {
       totalRow = Repository.Count();
-      return Repository.QueryPage(page, pageSize, post => post.CategoryId == categoryId, null, posts => posts.Include(p => p.PostCategory)).ToList();
+      return Repository.QueryPage(page, pageSize, post => post.CategoryId == categoryId, null,
+        posts => posts.Include(p => p.PostCategory)).ToList();
     }
 
     public Post GetById(int id)

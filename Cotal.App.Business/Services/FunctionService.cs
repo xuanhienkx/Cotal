@@ -5,7 +5,6 @@ using Cotal.App.Business.Infrastructure.Extensions;
 using Cotal.App.Business.ViewModels.System;
 using Cotal.App.Model.Models;
 using Cotal.Core.InfacBase.Uow;
-using Microsoft.EntityFrameworkCore;
 
 namespace Cotal.App.Business.Services
 {
@@ -28,13 +27,16 @@ namespace Cotal.App.Business.Services
     int Save();
     bool CheckExistedId(string id);
   }
+
   public class FunctionService : ServiceBace<Function, string>, IFunctionService
   {
-    private IMapper _mapper;
+    private readonly IMapper _mapper;
+
     public FunctionService(IUowProvider uowProvider, IMapper mapper) : base(uowProvider)
     {
       _mapper = mapper;
     }
+
     public FunctionViewModel Create(FunctionViewModel function)
     {
       var model = new Function();
@@ -52,12 +54,12 @@ namespace Cotal.App.Business.Services
 
     public IEnumerable<FunctionViewModel> GetAllWithPermission(List<int> roleIds)
     {
-      var qr = (from f in DB.Functions
-                join p in DB.Permissions on f.Id equals p.FunctionId
-                where roleIds.Contains(p.RoleId) && (p.CanRead == true)
-                select f);
+      var qr = from f in DB.Functions
+        join p in DB.Permissions on f.Id equals p.FunctionId
+        where roleIds.Contains(p.RoleId) && p.CanRead
+        select f;
       var parentIds = qr.Select(x => x.ParentId).Distinct();
-      qr = qr.Union(Repository.Query(x => parentIds.Contains(x.Id)));                                       
+      qr = qr.Union(Repository.Query(x => parentIds.Contains(x.Id)));
       return _mapper.Map<IEnumerable<Function>, IEnumerable<FunctionViewModel>>(qr.AsEnumerable());
     }
 

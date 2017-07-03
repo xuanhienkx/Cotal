@@ -7,45 +7,44 @@ using Cotal.Core.InfacBase.Entities;
 
 namespace Cotal.App.Model.Models
 {
-    [Table("Orders")]
-    public class Order : EntityBase<int>
-    {      
+  [Table("Orders")]
+  public class Order : EntityBase<int>
+  {
+    [Required]
+    [MaxLength(256)]
+    public string CustomerName { set; get; }
 
-        [Required]
-        [MaxLength(256)]
-        public string CustomerName { set; get; }
+    [Required]
+    [MaxLength(256)]
+    public string CustomerAddress { set; get; }
 
-        [Required]
-        [MaxLength(256)]
-        public string CustomerAddress { set; get; }
+    [Required]
+    [MaxLength(256)]
+    public string CustomerEmail { set; get; }
 
-        [Required]
-        [MaxLength(256)]
-        public string CustomerEmail { set; get; }
+    [Required]
+    [MaxLength(50)]
+    public string CustomerMobile { set; get; }
 
-        [Required]
-        [MaxLength(50)]
-        public string CustomerMobile { set; get; }
+    [Required]
+    [MaxLength(256)]
+    public string CustomerMessage { set; get; }
 
-        [Required]
-        [MaxLength(256)]
-        public string CustomerMessage { set; get; }
+    [MaxLength(256)]
+    public string PaymentMethod { set; get; }
 
-        [MaxLength(256)]
-        public string PaymentMethod { set; get; }
+    public DateTime? CreatedDate { set; get; }
+    public string CreatedBy { set; get; }
+    public string PaymentStatus { set; get; }
+    public bool Status { set; get; }
 
-        public DateTime? CreatedDate { set; get; }
-        public string CreatedBy { set; get; }
-        public string PaymentStatus { set; get; }
-        public bool Status { set; get; }
+    [StringLength(128)]
+    [Column(TypeName = "nvarchar")]
+    public int CustomerId { set; get; }
 
-        [StringLength(128)]
-        [Column(TypeName = "nvarchar")]
-        public int CustomerId { set; get; }
+    [ForeignKey("CustomerId")]
+    public virtual IUser User { set; get; }
 
-        [ForeignKey("CustomerId")]
-        public virtual IUser User { set; get; }
-
-        public virtual ICollection<OrderDetail> OrderDetails { set; get; }
-    }
+    public virtual ICollection<OrderDetail> OrderDetails { set; get; }
+  }
 }

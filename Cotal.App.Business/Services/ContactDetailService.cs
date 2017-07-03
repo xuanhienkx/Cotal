@@ -8,6 +8,7 @@ namespace Cotal.App.Business.Services
   {
     ContactDetail GetDefaultContact();
   }
+
   public class ContactDetailService : ServiceBace<ContactDetail, int>, IContactDetailService
   {
     public ContactDetailService(IUowProvider uowProvider) : base(uowProvider)
@@ -19,5 +20,4 @@ namespace Cotal.App.Business.Services
       return Repository.Query(x => x.Status).FirstOrDefault();
     }
   }
-  
 }

@@ -15,10 +15,12 @@ namespace Cotal.App.Business.Services
 
     SystemConfig GetSystemConfig(string code);
   }
+
   public class CommonService : ServiceBace<Footer, string>, ICommonService
   {
     private readonly IRepository<Slide, int> _slideRepository;
     private readonly IRepository<SystemConfig, int> _systemConfigRepository;
+
     public CommonService(IUowProvider uowProvider) : base(uowProvider)
     {
       _slideRepository = UnitOfWork.GetRepository<Slide, int>();

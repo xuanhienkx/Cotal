@@ -3,14 +3,12 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using Cotal.App.Business.Services;
 using Cotal.Core.Identity.Services;
 using Cotal.Web.Authen;
-using Microsoft.AspNetCore.Builder;   
+using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;                
 
-namespace Cotal.Web 
+namespace Cotal.Web
 {
   public partial class Startup
   {
@@ -71,16 +69,16 @@ namespace Cotal.Web
       });
     }
 
-    private  Task<ClaimsIdentity> GetIdentity(string username, string password, IUserService userService)
+    private Task<ClaimsIdentity> GetIdentity(string username, string password, IUserService userService)
     {
-                                                                                                 
-      if (userService.Login(username,password))
-      {
+      if (userService.Login(username, password))
         return Task.FromResult(
           new ClaimsIdentity(new GenericIdentity(username, "Token"),
-          new Claim[] { /*new Claim("Roles", JsonConvert.SerializeObject(_loginService.CurrenrUser(username))) */ }));
-      }
-             
+            new Claim[]
+            {
+              /*new Claim("Roles", JsonConvert.SerializeObject(_loginService.CurrenrUser(username))) */
+            }));
+
       // Credentials are invalid, or account doesn't exist
       return Task.FromResult<ClaimsIdentity>(null);
     }

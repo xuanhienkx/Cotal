@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Reflection;
 using Cotal.App.Business.Services;
-using Cotal.App.Data.Contexts;           
+using Cotal.App.Data.Contexts;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Cotal.App.Business
 {
   [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
   public abstract class DependencyAttribute : Attribute
   {
-    public ServiceLifetime DependencyType { get; set; }
-
-    public Type ServiceType { get; set; }
-
     protected DependencyAttribute(ServiceLifetime dependencyType)
     {
       DependencyType = dependencyType;
     }
+
+    public ServiceLifetime DependencyType { get; set; }
+
+    public Type ServiceType { get; set; }
 
     public ServiceDescriptor BuildServiceDescriptor(TypeInfo type)
     {
@@ -32,7 +31,6 @@ namespace Cotal.App.Business
 
     public static void RegisterServices(IServiceCollection services)
     {
-                                                                    
       //services.TryAddTransient(typeof(IServiceBase<,>), typeof(GenericEntityService<,>));
       services.AddScoped<IDbCotalInitializer, DbCotalInitializer>();
 
@@ -45,7 +43,5 @@ namespace Cotal.App.Business
       //services.AddTransient<ICommonService, CommonService>();
       //services.AddTransient<IContactDetailService, IContactDetailService>();
     }
-
   }
-
 }

@@ -12,6 +12,7 @@ namespace Cotal.App.Business.Services
     void DeleteAll(string functionId);
     void Save();
   }
+
   public class PermissionService : ServiceBace<Permission, int>, IPermissionService
   {
     public PermissionService(IUowProvider uowProvider) : base(uowProvider)

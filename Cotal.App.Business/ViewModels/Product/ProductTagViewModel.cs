@@ -2,14 +2,14 @@
 
 namespace Cotal.App.Business.ViewModels.Product
 {
-    public class ProductTagViewModel
-    {
-        public int ProductID { set; get; }
+  public class ProductTagViewModel
+  {
+    public int ProductID { set; get; }
 
-        public string TagID { set; get; }
+    public string TagID { set; get; }
 
-        public virtual ProductViewModel Post { set; get; }
+    public virtual ProductViewModel Post { set; get; }
 
-        public virtual TagViewModel Tag { set; get; }
-    }
+    public virtual TagViewModel Tag { set; get; }
+  }
 }

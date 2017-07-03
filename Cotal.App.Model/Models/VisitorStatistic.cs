@@ -5,14 +5,13 @@ using Cotal.Core.InfacBase.Entities;
 
 namespace Cotal.App.Model.Models
 {
-    [Table("VisitorStatistics")]
-    public class VisitorStatistic : EntityBase<int>
-    {
+  [Table("VisitorStatistics")]
+  public class VisitorStatistic : EntityBase<int>
+  {
+    [Required]
+    public DateTime VisitedDate { set; get; }
 
-        [Required]
-        public DateTime VisitedDate { set; get; }
-
-        [MaxLength(50)]
-        public string IpAddress { set; get; }
-    }
+    [MaxLength(50)]
+    public string IpAddress { set; get; }
+  }
 }

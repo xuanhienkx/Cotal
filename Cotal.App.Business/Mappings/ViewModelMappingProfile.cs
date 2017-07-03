@@ -24,6 +24,7 @@ namespace Cotal.App.Business.Mappings
       CreateMap<Slide, SlideViewModel>();
       CreateMap<Page, PageViewModel>();
     }
+
     /* public static void Configure()
      {
          Mapper.Initialize(cfg =>

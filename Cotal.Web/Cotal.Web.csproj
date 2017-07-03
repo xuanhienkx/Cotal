@@ -42,7 +42,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Cotal.App.Business\Cotal.App.Business.csproj" />
     <ProjectReference Include="..\Cotal.App.Data\Cotal.App.Data.csproj" />
-    <ProjectReference Include="..\Cotal.App.Model\Cotal.App.Model.csproj" />
     <ProjectReference Include="..\Cotal.Core.Identity\Cotal.Core.Identity.csproj" />
   </ItemGroup>
 </Project>

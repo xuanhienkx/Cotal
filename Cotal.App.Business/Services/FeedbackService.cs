@@ -9,6 +9,7 @@ namespace Cotal.App.Business.Services
 
     void Save();
   }
+
   public class FeedbackService : ServiceBace<Feedback, int>, IFeedbackService
   {
     public FeedbackService(IUowProvider uowProvider) : base(uowProvider)

@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
+using Cotal.App.Business.ViewModels.Common;
 using Cotal.App.Model.Models;
 using Cotal.Core.InfacBase.Repositories;
 using Cotal.Core.InfacBase.Uow;
@@ -8,46 +11,68 @@ namespace Cotal.App.Business.Services
 {
   public interface IAnnouncementService
   {
-    Announcement Create(Announcement announcement);
+    AnnouncementViewModel Create(AnnouncementViewModel announcement, int userId);
 
-    List<Announcement> GetListByUserId(int userId, int pageIndex, int pageSize, out int totalRow);
+    IEnumerable<AnnouncementViewModel> GetListByUserId(int userId, int pageIndex, int pageSize, out int totalRow);
 
-    List<Announcement> GetListByUserId(int userId, int top);
+    IEnumerable<AnnouncementViewModel> GetListByUserId(int userId, int top);
 
     void Delete(int notificationId);
 
     void MarkAsRead(int userId, int notificationId);
 
-    Announcement GetDetail(int id);
+    AnnouncementViewModel GetDetail(int id);
 
-    List<Announcement> GetListAll(int pageIndex, int pageSize, out int totalRow);
+    IEnumerable<AnnouncementViewModel> GetListAll(int pageIndex, int pageSize, out int totalRow);
 
-    List<Announcement> ListAllUnread(int userId, int pageIndex, int pageSize, out int totalRow);
+    IEnumerable<AnnouncementViewModel> ListAllUnread(int userId, int pageIndex, int pageSize, out int totalRow);
 
     void Save();
   }
+
   public class AnnouncementService : ServiceBace<Announcement, int>, IAnnouncementService
   {
     private readonly IRepository<AnnouncementUser, int> _announcementUserRepository;
-    public AnnouncementService(IUowProvider uowProvider) : base(uowProvider)
+    private readonly IMapper _mapper;
+
+    public AnnouncementService(IUowProvider uowProvider, IMapper mapper) : base(uowProvider)
     {
+      _mapper = mapper;
       _announcementUserRepository = UnitOfWork.GetRepository<AnnouncementUser, int>();
     }
 
-    public Announcement Create(Announcement announcement)
+    public AnnouncementViewModel Create(AnnouncementViewModel announcement, int userId)
     {
-      return Repository.Add(announcement);
+      var newAnnoun = new Announcement
+      {
+        Content = announcement.Content,
+        Status = announcement.Status,
+        Title = announcement.Title,
+        CreatedDate = DateTime.Now,
+        UserId = userId
+      };
+      foreach (var user in announcement.AnnouncementUsers)
+        newAnnoun.AnnouncementUsers.Add(new AnnouncementUser
+        {
+          UserId = user.UserId,
+          HasRead = false
+        });
+      var db = Repository.Add(newAnnoun);
+      Save();
+      return _mapper.Map<Announcement, AnnouncementViewModel>(db);
     }
 
-    public List<Announcement> GetListByUserId(int userId, int pageIndex, int pageSize, out int totalRow)
+    public IEnumerable<AnnouncementViewModel> GetListByUserId(int userId, int pageIndex, int pageSize, out int totalRow)
     {
       totalRow = Repository.Count(a => a.UserId == userId);
-      return Repository.QueryPage(pageIndex, pageSize, a => a.UserId == userId).ToList();
+      var list = Repository.QueryPage(pageIndex, pageSize, a => a.UserId == userId);
+      return _mapper.Map<IEnumerable<Announcement>, IEnumerable<AnnouncementViewModel>>(list);
     }
 
-    public List<Announcement> GetListByUserId(int userId, int top)
+    public IEnumerable<AnnouncementViewModel> GetListByUserId(int userId, int top)
     {
-      return Repository.Query(x => x.UserId == userId).Take(top).ToList();
+      var list = Repository.Query(x => x.UserId == userId).Take(top);
+      return _mapper.Map<IEnumerable<Announcement>, IEnumerable<AnnouncementViewModel>>(list);
     }
 
     public void Delete(int notificationId)
@@ -58,39 +83,38 @@ namespace Cotal.App.Business.Services
 
     public void MarkAsRead(int userId, int notificationId)
     {
-      var announs = _announcementUserRepository.Query(x => x.UserId == userId && x.AnnouncementId == notificationId).FirstOrDefault();
+      var announs = _announcementUserRepository.Query(x => x.UserId == userId && x.AnnouncementId == notificationId)
+        .FirstOrDefault();
       if (announs == null)
-      {
-        _announcementUserRepository.Add(new AnnouncementUser()
+        _announcementUserRepository.Add(new AnnouncementUser
         {
           AnnouncementId = notificationId,
           UserId = userId,
-          HasRead = true,
+          HasRead = true
         });
-      }
       else
-      {
         announs.HasRead = true;
-      }
       Save();
-
     }
 
-    public Announcement GetDetail(int id)
+    public AnnouncementViewModel GetDetail(int id)
     {
-      return Repository.Get(id);
+      var db = Repository.Get(id);
+      return _mapper.Map<Announcement, AnnouncementViewModel>(db);
     }
 
-    public List<Announcement> GetListAll(int pageIndex, int pageSize, out int totalRow)
+    public IEnumerable<AnnouncementViewModel> GetListAll(int pageIndex, int pageSize, out int totalRow)
     {
       totalRow = Repository.Count();
-      return Repository.QueryPage(pageIndex, pageSize, null, q => q.OrderBy(x => x.CreatedDate)).ToList();
+      var list = Repository.QueryPage(pageIndex, pageSize, null, q => q.OrderBy(x => x.CreatedDate));
+      return _mapper.Map<IEnumerable<Announcement>, IEnumerable<AnnouncementViewModel>>(list);
     }
 
-    public List<Announcement> ListAllUnread(int userId, int pageIndex, int pageSize, out int totalRow)
+    public IEnumerable<AnnouncementViewModel> ListAllUnread(int userId, int pageIndex, int pageSize, out int totalRow)
     {
       totalRow = Repository.Count(a => a.UserId == userId);
-      return Repository.QueryPage(pageIndex, pageSize, a => a.UserId == userId, q => q.OrderBy(x => x.CreatedDate)).ToList();
+      var list = Repository.QueryPage(pageIndex, pageSize, a => a.UserId == userId, q => q.OrderBy(x => x.CreatedDate));
+      return _mapper.Map<IEnumerable<Announcement>, IEnumerable<AnnouncementViewModel>>(list);
     }
 
     public void Save()
