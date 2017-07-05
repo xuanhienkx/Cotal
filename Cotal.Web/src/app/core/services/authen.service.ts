@@ -21,7 +21,7 @@ export class AuthenService {
       encodeURIComponent(password);
 
     return this._http.post(url, body, options).map((response: Response) => {
-      let user: LoggedInUser = response.json(); 
+      let user: LoggedInUser = response.json();
       if (user && user.access_token) {
         localStorage.setItem(SystemConstants.CURRENT_USER, JSON.stringify(user));
       }
@@ -44,10 +44,49 @@ export class AuthenService {
     if (this.isUserAuthenticated()) {
       var userData = JSON.parse(localStorage.getItem(SystemConstants.CURRENT_USER));
       user = new LoggedInUser(userData.access_token, userData.UserName, userData.ExpiresIn,
-        userData.FullName, userData.Email, userData.Avatar, userData.Permission, userData.Roles);
+        userData.FullName, userData.Email, userData.Avatar, userData.Permissions, userData.Roles);
     }
     else
       user = null;
     return user;
+  }
+  checkAccess(functionId: string) {
+    var user = this.getLoggedInUser();
+    var result: boolean = false;
+    var permission: any[] = JSON.parse(user.Permissions);
+    var roles: any[] = JSON.parse(user.Roles);
+    var hasPermission: number = permission.findIndex(x => x.FunctionId == functionId && x.CanRead == true);
+    if (hasPermission != -1 || roles.findIndex(x => x == "Administrator") != -1) {
+      return true;
+    }
+    else
+      return false;
+  }
+  hasPermission(functionId: string, action: string): boolean {
+    var user = this.getLoggedInUser();
+    var result: boolean = false;
+    var permission: any[] = [];
+    if (user.Permissions) {
+      user.Permissions = JSON.parse(user.Permissions);
+    }
+    var roles: any[] = JSON.parse(user.Roles);
+    switch (action) {
+      case 'create':
+        var hasPermission: number = permission.findIndex(x => x.FunctionId == functionId && x.CanCreate == true);
+        if (hasPermission != -1 || roles.findIndex(x => x == "Administrator") != -1)
+          result = true;
+        break;
+      case 'update':
+        var hasPermission: number = permission.findIndex(x => x.FunctionId == functionId && x.CanUpdate == true);
+        if (hasPermission != -1 || roles.findIndex(x => x == "Administrator") != -1)
+          result = true;
+        break;
+      case 'delete':
+        var hasPermission: number = permission.findIndex(x => x.FunctionId == functionId && x.CanDelete == true);
+        if (hasPermission != -1 || roles.findIndex(x => x == "Administrator") != -1)
+          result = true;
+        break;
+    }
+    return result;
   }
 }

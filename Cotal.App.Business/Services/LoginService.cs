@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Cotal.App.Business.ViewModels.System;
 using Cotal.App.Model.Models;
@@ -11,7 +12,7 @@ namespace Cotal.App.Business.Services
   public interface ILoginService
   {
     bool IsLogin(string userName, string password);
-    AppUserViewModel CurrenrUser(string userName);
+    Task<AppUserViewModel> CurrenrUser(string userName);
   }
 
   public class LoginService : ILoginService
@@ -32,16 +33,17 @@ namespace Cotal.App.Business.Services
       return _userService.Login(userName, password);
     }
 
-    public AppUserViewModel CurrenrUser(string userName)
+    public async Task<AppUserViewModel> CurrenrUser(string userName)
     {
-      var user = _userService.GetUserByUsername(userName).Result;
-      var roles = _userService.GetRolsByUser(user.Id);
+      var user = await _userService.GetUserByUsername(userName);
+      var roles = await _userService.GetRolsByUser(user.Id);
       var roleIds = roles.Select(x => x.Id).ToList();
       var permistion = _permission.GetByRoleIds(roleIds ?? new List<int>());
       var permistionView =
         _mapper.Map<IEnumerable<Permission>, IEnumerable<PermissionViewModel>>(permistion ?? new List<Permission>());
       var userView = _mapper.Map<AppUser, AppUserViewModel>(user);
-      userView.Roles = _mapper.Map<IEnumerable<AppRole>, IEnumerable<AppRoleViewModel>>(roles ?? new List<AppRole>());
+      userView.Roles = roles.Select(x => x.Name).ToList();
+      userView.RoleIds = roles.Select(x => x.Id).ToList();
       userView.Permissions = permistionView;
       return userView;
     }

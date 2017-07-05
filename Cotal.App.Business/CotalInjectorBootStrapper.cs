@@ -31,7 +31,7 @@ namespace Cotal.App.Business
 
     public static void RegisterServices(IServiceCollection services)
     {
-      //services.TryAddTransient(typeof(IServiceBase<,>), typeof(GenericEntityService<,>));
+     //  services.AddTransient(typeof(IServiceBase<,>), typeof(GenericEntityService<,>));
       services.AddScoped<IDbCotalInitializer, DbCotalInitializer>();
 
       //// Infra - Identity Services                          
@@ -40,8 +40,8 @@ namespace Cotal.App.Business
       services.AddTransient<IAnnouncementService, AnnouncementService>();
       services.AddTransient<IPermissionService, PermissionService>();
       services.AddTransient<ILoginService, LoginService>();
-      //services.AddTransient<ICommonService, CommonService>();
-      //services.AddTransient<IContactDetailService, IContactDetailService>();
+      services.AddTransient<IAppUserService, AppUserService>();                  
+      services.AddTransient<IAppRoleService, AppRoleService>();                  
     }
   }
 }

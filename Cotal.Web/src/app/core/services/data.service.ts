@@ -21,7 +21,7 @@ export class DataService {
     let currentUser = JSON.parse(localStorage.getItem(SystemConstants.CURRENT_USER)); 
     if (currentUser && currentUser.access_token) {
       let headersA = new Headers({ 'Authorization': 'Bearer ' + currentUser.access_token }); 
-      headersA.append('Content-Type', 'application/json');
+      headersA.append('content-Type', 'application/json; charset=utf-8');
       return new RequestOptions({ headers: headersA });
     }
   }
@@ -30,6 +30,7 @@ export class DataService {
     return this._http.get(SystemConstants.BASE_API + uri, this.jwt()).map(this.extractData);
   }
   post(uri: string, data?: any) {    
+    console.log(data);
     return this._http.post(SystemConstants.BASE_API + uri, data, this.jwt()).map(this.extractData);
   }
   put(uri: string, data?: any) {

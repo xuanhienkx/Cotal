@@ -16,8 +16,9 @@ namespace Cotal.App.Business.ViewModels.System
     public bool Status { get; set; }
 
     public string Gender { get; set; }
-
-    public IEnumerable<AppRoleViewModel> Roles { get; set; }
+                                                                 
+    public List<string> Roles { get; set; }
+    public List<int> RoleIds { get; set; }
     public IEnumerable<PermissionViewModel> Permissions { get; set; }
   }
 }

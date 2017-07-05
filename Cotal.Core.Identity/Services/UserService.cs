@@ -9,17 +9,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cotal.Core.Identity.Services
 {
-  public interface IUserService   
+  public interface IUserService
   {
     Task<AppUser> GetUserByUsername(string username);
-    Task<IdentityResult> CreateUser(AppUser user, string password);
+    Task<AppUser> GetUserByUserId(int id);
     PasswordVerificationResult VerifyHashedPassword(AppUser user, string password);
     Task<IList<Claim>> GetClaims(AppUser user);
     bool Login(string userName, string password);
-    IEnumerable<AppRole> GetRolsByUser(int useId);
-    List<int> GetRolesIdByUser(int useId);
-    List<string> GetRolesNameByUser(int useId);
-    List<string> GetRolesNameByUser(string userName);
+    Task<IEnumerable<AppUser>> GetAllAsync();
+    IEnumerable<AppUser> GetAll(int page, int pageSize, out int totalRow, string filter = null);
+    Task<bool> Create(AppUser model, string password, List<string> roles);
+    Task<bool> Update(AppUser model, List<string> roles);
+    Task<bool> Delete(int id);
+    Task<IEnumerable<AppRole>> GetRolsByUser(int useId);
+    Task<IEnumerable<AppRole>> GetAllRole();
+    IEnumerable<AppRole> GetAllRole(int page, int pageSize, out int totalRow, string filter = null);
+    Task<AppRole> GetRole(int id);
+    Task<AppRole> GetRole(string name);
+    Task<List<int>> GetRolesIdByUser(int useId);
+    Task<List<string>> GetRolesNameByUser(int useId);
+    Task<List<string>> GetRolesNameByUser(string userName);
+    Task<bool> CreateRole(AppRole model);
+    Task<bool> UpdateRole(AppRole model);
+    Task<bool> DeleteRole(int id);
   }
   public class UserService : IUserService
   {
@@ -27,39 +39,73 @@ namespace Cotal.Core.Identity.Services
     private readonly IPasswordHasher<AppUser> _passwordHasher;
     private readonly RoleManager<AppRole> _roleManager;
 
-    public UserService(ApplicationDbContext context, UserManager<AppUser> userManager, IPasswordHasher<AppUser> hasher, RoleManager<AppRole> roleManager)
+    public UserService(UserManager<AppUser> userManager, IPasswordHasher<AppUser> hasher, RoleManager<AppRole> roleManager, ApplicationDbContext context)
     {
       _userManager = userManager;
       _passwordHasher = hasher;
       _roleManager = roleManager;
     }
 
+    #region User
+
     public async Task<AppUser> GetUserByUsername(string username)
     {
       return await _userManager.FindByNameAsync(username);
     }
-    public IEnumerable<AppRole> GetRolsByUser(int useId)
+
+    public async Task<AppUser> GetUserByUserId(int id)
     {
-      return _roleManager.Roles.Where(x => x.Users.Any(u => u.UserId == useId)).ToList();
+      return await _userManager.FindByIdAsync(id.ToString());
     }
 
-    public List<int> GetRolesIdByUser(int useId)
+    public async Task<IEnumerable<AppUser>> GetAllAsync()
     {
-      var roles = GetRolsByUser(useId);
-      return roles.Select(x => x.Id).ToList();
+      var users = await _userManager.Users.ToListAsync();
+      return users;
     }
 
-    public List<string> GetRolesNameByUser(int useId)
+    public IEnumerable<AppUser> GetAll(int page, int pageSize, out int totalRow, string filter = null)
     {
-      var roles = GetRolsByUser(useId);
-      return roles.Select(x => x.Name).ToList();
+      var users = _userManager.Users.Where(x => string.IsNullOrEmpty(filter) || x.UserName.Contains(filter));
+      totalRow = users.Count();
+      return users.OrderBy(x => x.UserName).Skip((page - 1) * pageSize).Take(pageSize);
     }
 
-    public List<string> GetRolesNameByUser(string userName)
+    public async Task<bool> Create(AppUser model, string password, List<string> roles)
     {
-      var user = GetUserByUsername(userName).Result;
-      var roles = _roleManager.Roles.Where(x => x.Users.Any(u => u.UserId == user.Id));
-      return roles.Select(x => x.Name).ToList();
+      var result = await _userManager.CreateAsync(model, password);
+      if (result.Succeeded)
+      {
+        var newUser = await _userManager.FindByNameAsync(model.UserName);
+        await _userManager.AddToRolesAsync(newUser, roles ?? new List<string>());
+      }
+
+      return result.Succeeded;
+    }
+
+    public async Task<bool> Update(AppUser model, List<string> roles)
+    {
+      var result = await _userManager.UpdateAsync(model);
+      if (result.Succeeded)
+      {
+        var newUser = await _userManager.FindByNameAsync(model.UserName);
+        var userRoles = await _userManager.GetRolesAsync(newUser);
+        await _userManager.RemoveFromRolesAsync(newUser, userRoles.ToArray());
+        await _userManager.AddToRolesAsync(newUser, roles ?? new List<string>());
+        return result.Succeeded;
+      }
+      else
+      {
+        return false;
+      }
+
+    }
+
+    public async Task<bool> Delete(int id)
+    {
+      var user = await GetUserByUserId(id);
+      var result = await _userManager.DeleteAsync(user);
+      return result.Succeeded;
     }
 
     public async Task<IdentityResult> CreateUser(AppUser user, string password)
@@ -84,5 +130,79 @@ namespace Cotal.Core.Identity.Services
       var p = VerifyHashedPassword(result, password);
       return p == PasswordVerificationResult.Success;
     }
+
+    #endregion
+
+    #region Roles
+
+    public async Task<IEnumerable<AppRole>> GetRolsByUser(int useId)
+    {
+      return await _roleManager.Roles.Where(x => x.Users.Any(u => u.UserId == useId)).ToListAsync();
+    }
+
+    public async Task<IEnumerable<AppRole>> GetAllRole()
+    {
+      return await _roleManager.Roles.ToListAsync();
+    }
+
+    public IEnumerable<AppRole> GetAllRole(int page, int pageSize, out int totalRow, string filter = null)
+    {
+      var roles = _roleManager.Roles.Where(x => string.IsNullOrEmpty(filter) || x.Description.Contains(filter));
+      totalRow = roles.Count();
+      return roles.OrderBy(x => x.Name).Skip((page - 1) * pageSize).Take(pageSize);
+    }
+
+    public async Task<AppRole> GetRole(int id)
+    {
+      var role = await _roleManager.Roles.FirstOrDefaultAsync(x => x.Id == id);
+      return role;
+    }
+
+    public async Task<AppRole> GetRole(string name)
+    {
+      var role = await _roleManager.Roles.FirstOrDefaultAsync(x => x.Name == name);
+      return role;
+    }
+
+    public async Task<List<int>> GetRolesIdByUser(int useId)
+    {
+      var roles = await GetRolsByUser(useId);
+      return roles.Select(x => x.Id).ToList();
+    }
+
+    public async Task<List<string>> GetRolesNameByUser(int useId)
+    {
+      var roles = await GetRolsByUser(useId);
+      return roles.Select(x => x.Name).ToList();
+    }
+
+    public async Task<List<string>> GetRolesNameByUser(string userName)
+    {
+      var user = await GetUserByUsername(userName);
+      var roles = _roleManager.Roles.Where(x => x.Users.Any(u => u.UserId == user.Id));
+      return roles.Select(x => x.Name).ToList();
+    }
+
+    public async Task<bool> CreateRole(AppRole model)
+    {
+      var result = await _roleManager.CreateAsync(model);
+      return result.Succeeded;
+    }
+
+    public async Task<bool> UpdateRole(AppRole model)
+    {
+      var result = await _roleManager.UpdateAsync(model);
+      return result.Succeeded;
+    }
+
+    public async Task<bool> DeleteRole(int id)
+    {
+      var role = await _roleManager.Roles.FirstOrDefaultAsync(x => x.Id == id);
+      var result = await _roleManager.DeleteAsync(role);
+      return result.Succeeded;
+    }
+
+    #endregion
+
   }
 }

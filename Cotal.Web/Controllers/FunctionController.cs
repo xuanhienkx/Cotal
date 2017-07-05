@@ -3,20 +3,22 @@ using System.Linq;
 using Cotal.App.Business.Services;
 using Cotal.App.Business.ViewModels.System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Cotal.Web.Controllers
 {
   [Route("api/[controller]")]
-  public class FunctionController : AdminControllerBase
+  public class FunctionController : AdminControllerBase<FunctionController>
   {
     private readonly IFunctionService _functionService;
 
-    public FunctionController(IFunctionService functionService)
+    public FunctionController(IFunctionService functionService, ILoggerFactory loggerFactory) : base(loggerFactory)
     {
       _functionService = functionService;
     }
+                                               
 
     [HttpGet("GetAllHierachy")]
     public IActionResult GetAllHierachy()

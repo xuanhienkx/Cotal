@@ -86,7 +86,7 @@ namespace Cotal.Web.Authen
 
       // Specifically add the jti (nonce), iat (issued timestamp), and sub (subject/user) claims.
       // You can add other claims here, if you want:
-      var user = _loginService.CurrenrUser(username);
+      var user = await _loginService.CurrenrUser(username);
       var claims = new[]
       {
         new Claim(JwtRegisteredClaimNames.Sub, username),
@@ -114,7 +114,7 @@ namespace Cotal.Web.Authen
         access_token = encodedJwt,
         ExpiresIn = (int) _options.Expiration.TotalSeconds,
         Permissions = JsonConvert.SerializeObject(user.Permissions),
-        Roles = JsonConvert.SerializeObject(user.Roles.Select(x => x.Name).ToList())
+        Roles = JsonConvert.SerializeObject(user.Roles)
       };
 
       // Serialize and return the response

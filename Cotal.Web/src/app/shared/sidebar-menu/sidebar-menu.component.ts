@@ -11,6 +11,9 @@ export class SidebarMenuComponent implements OnInit {
   constructor(private dataService: DataService) { }
 
   ngOnInit() {
+     this.loadFuntion();
+  }
+  loadFuntion(){
     this.dataService.get('/api/Function/GetAllHierachy').subscribe((response: any[]) => {
       this.functions = response.sort((n1, n2) => {
         if (n1.DisplayOrder > n2.DisplayOrder)
@@ -18,8 +21,10 @@ export class SidebarMenuComponent implements OnInit {
         else if (n1.DisplayOrder < n2.DisplayOrder)
           return -1;
         return 0;
-      }); 
-    }, error => this.dataService.handleError(error)); 
+      });
+      console.log(this.functions) 
+    }, error => this.dataService.handleError(error));
+
   }
 
 }

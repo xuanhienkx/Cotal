@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using AutoMapper;
 using Cotal.App.Business;
-using Cotal.App.Data;
 using Cotal.App.Data.Contexts;
 using Cotal.Core.Identity;
 using Cotal.Core.Identity.Data;
 using Cotal.Core.Identity.Models;
 using Cotal.Core.InfacBase.Startup;
-using Cotal.Web.Authen;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
-using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.Swagger;                                                      
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Swashbuckle.AspNetCore.Swagger;
+using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace Cotal.Web
 {
@@ -32,10 +25,10 @@ namespace Cotal.Web
     public Startup(IHostingEnvironment env)
     {
       var builder = new ConfigurationBuilder()
-          .SetBasePath(env.ContentRootPath)
-          .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-          .AddEnvironmentVariables();
+        .SetBasePath(env.ContentRootPath)
+        .AddJsonFile("appsettings.json", false, true)
+        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
+        .AddEnvironmentVariables();
       Configuration = builder.Build();
     }
 
@@ -62,16 +55,21 @@ namespace Cotal.Web
         .AddDefaultTokenProviders();
 
 
-      services.AddDbContext<CotalContex>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+      services.AddDbContext<CotalContex>(
+        options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
       services.AddDataAccess<CotalContex>();
 
       #endregion
+
       // Add framework services.
-     // services.AddMvc();
+      // services.AddMvc();
+      //AddJsonOptions
       services.AddMvc().AddJsonOptions(options =>
       {
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;              
+        options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
       });
       // .NET Native DI Abstraction
       RegisterServices(services);
@@ -96,20 +94,20 @@ namespace Cotal.Web
         options.IncludeXmlComments(filePath);
         options.DescribeAllEnumsAsStrings();
       });
-
     }
+
     private static void RegisterServices(IServiceCollection services)
     {
-
       services.AddAutoMapper();
       // Application
       // services.AddSingleton(AutoMapperConfig.RegisterMappings());
       services.AddSingleton(Mapper.Configuration);
-      services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<AutoMapper.IConfigurationProvider>(), sp.GetService));
+      services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<IConfigurationProvider>(), sp.GetService));
       // Adding dependencies from another layers (isolated from Presentation)
       IdentityInjectorBootStrapper.RegisterServices(services);
       CotalInjectorBootStrapper.RegisterServices(services);
-    }                                                                              
+    }
+
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
     {
@@ -124,7 +122,8 @@ namespace Cotal.Web
 
         // If there's no available file and the request doesn't contain an extension, we're probably trying to access a page.
         // Rewrite request to use app root
-        if (context.Response.StatusCode == 404 && !Path.HasExtension(context.Request.Path.Value) && !context.Request.Path.Value.StartsWith("/api"))
+        if (context.Response.StatusCode == 404 && !Path.HasExtension(context.Request.Path.Value) &&
+            !context.Request.Path.Value.StartsWith("/api"))
         {
           context.Request.Path = "/index.html";
           context.Response.StatusCode = 200; // Make sure we update the status code, otherwise it returns 404
@@ -132,27 +131,20 @@ namespace Cotal.Web
         }
       });
 
-      app.UseDefaultFiles();
-      app.UseStaticFiles();                  
 
       app.UseMvc(routes =>
       {
         routes.MapRoute(
-          name: "default",
-          template: "api/{controller=Home}/{action=Index}/{id?}");
+          "default",
+          "api/{controller=Home}/{action=Index}/{id?}");
         routes.MapSpaFallbackRoute("spa-fallback", new { controller = "Home", action = "Index" });
-
       });
-      app.UseSwagger(c =>
-      {
-        c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
-      });
+      // app.UseMvcWithDefaultRoute();
+      app.UseDefaultFiles();
+      app.UseStaticFiles();
+      app.UseSwagger(c => { c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value); });
       // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
-      app.UseSwaggerUI(c =>
-      {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cotal API V1");
-      });
+      app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cotal API V1"); });
     }
-
   }
 }

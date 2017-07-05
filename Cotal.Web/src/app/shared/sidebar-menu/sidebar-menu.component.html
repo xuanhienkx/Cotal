@@ -4,9 +4,11 @@
         <ul class="nav side-menu">
             <li><a><i class="fa fa-home"></i> Trang chủ</a>
             </li>
-            <li *ngFor="let item of functions"><a><i class="fa {{item.iconCss}}"></i> {{item.name}} <span *ngIf="item.childFunctions && item.childFunctions.length>0" class="fa fa-chevron-down"></span></a>
+            <li *ngFor="let item of functions"><a><i class="fa {{item.IconCss}}"></i> {{item.Name}} <span *ngIf="item.ChildFunctions && item.ChildFunctions.length>0" class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li *ngFor="let subItem of item.childFunctions"><a routerLink="{{subItem.URL}}" routerLinkActive="active">{{subItem.name}}</a></li>
+                    <li *ngFor="let subItem of item.ChildFunctions">
+                        <a routerLink="{{subItem.URL}}" routerLinkActive="active">{{subItem.Name}}</a>
+                    </li>
                 </ul>
             </li>
 

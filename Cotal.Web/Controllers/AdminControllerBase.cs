@@ -4,13 +4,26 @@ using Cotal.App.Business.Constants;
 using Cotal.App.Business.ViewModels.System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Cotal.Web.Controllers
 {
-  [Authorize]
-  public abstract class AdminControllerBase : Controller
+  public abstract class ControllerBase<T> : Controller //where T : Controller
   {
+    protected ILogger Logger;
+    protected ControllerBase(ILoggerFactory loggerFactory)
+    {
+      Logger = loggerFactory.CreateLogger<T>();
+    }
+
+  }
+  [Authorize]
+  public abstract class AdminControllerBase<T> : ControllerBase<T> //where T : Controller
+  {
+    public AdminControllerBase(ILoggerFactory loggerFactory) : base(loggerFactory)
+    {
+    }
     protected AppUserViewModel CurrentUser
     {
       get
@@ -21,14 +34,8 @@ namespace Cotal.Web.Controllers
       }
     }
 
-    protected List<string> CurrentRoleNames
-    {
-      get { return CurrentUser.Roles.Select(x => x.Name).ToList(); }
-    }
+    protected List<string> CurrentRoleNames => CurrentUser.Roles;
 
-    protected List<int> CurrentRoleIds
-    {
-      get { return CurrentUser.Roles.Select(x => x.Id).ToList(); }
-    }
+    protected List<int> CurrentRoleIds => CurrentUser.RoleIds;
   }
 }

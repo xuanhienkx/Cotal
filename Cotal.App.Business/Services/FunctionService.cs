@@ -48,7 +48,7 @@ namespace Cotal.App.Business.Services
 
     public IEnumerable<FunctionViewModel> GetAll(string filter)
     {
-      var functions = Repository.Query(x => x.Status && (string.IsNullOrEmpty(filter) || x.Name.Contains(filter)));
+      var functions = Repository.Query(x => x.Status && (string.IsNullOrEmpty(filter) || x.Name.Contains(filter)),f=>f.OrderBy(v=>v.DisplayOrder));
       return _mapper.Map<IEnumerable<Function>, IEnumerable<FunctionViewModel>>(functions);
     }
 
@@ -60,7 +60,7 @@ namespace Cotal.App.Business.Services
         select f;
       var parentIds = qr.Select(x => x.ParentId).Distinct();
       qr = qr.Union(Repository.Query(x => parentIds.Contains(x.Id)));
-      return _mapper.Map<IEnumerable<Function>, IEnumerable<FunctionViewModel>>(qr.AsEnumerable());
+      return _mapper.Map<IEnumerable<Function>, IEnumerable<FunctionViewModel>>(qr.OrderBy(f=>f.DisplayOrder).AsEnumerable());
     }
 
     public IEnumerable<FunctionViewModel> GetAllWithParentId(string parentId)

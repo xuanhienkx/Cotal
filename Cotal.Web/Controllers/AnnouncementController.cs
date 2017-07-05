@@ -3,17 +3,18 @@ using Cotal.App.Business.Services;
 using Cotal.App.Business.ViewModels.Common;
 using Cotal.Core.InfacBase.Paging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Cotal.Web.Controllers
 {
   [Route("api/[controller]")]
-  public class AnnouncementController : AdminControllerBase
+  public class AnnouncementController : AdminControllerBase<AnnouncementController>
   {
     private readonly IAnnouncementService _announcementService;
 
-    public AnnouncementController(IAnnouncementService announcementService)
+    public AnnouncementController(IAnnouncementService announcementService, ILoggerFactory loggerFactory) : base(loggerFactory)
     {
       _announcementService = announcementService;
     }
