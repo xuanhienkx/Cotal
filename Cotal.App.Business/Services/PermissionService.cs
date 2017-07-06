@@ -1,43 +1,67 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Cotal.App.Business.Infrastructure.Extensions;
+using Cotal.App.Business.ViewModels.System;
 using Cotal.App.Model.Models;
 using Cotal.Core.InfacBase.Uow;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cotal.App.Business.Services
 {
   public interface IPermissionService
   {
-    IEnumerable<Permission> GetByFunctionId(string functionId);
-    IEnumerable<Permission> GetByRoleIds(List<int> roleIds);
-    void Add(Permission permission);
+    Task<IEnumerable<PermissionViewModel>> GetByFunctionId(string functionId);
+    IEnumerable<PermissionViewModel> GetByRoleIds(List<int> roleIds);
+    void Add(PermissionViewModel permission);
     void DeleteAll(string functionId);
     void Save();
   }
 
   public class PermissionService : ServiceBace<Permission, int>, IPermissionService
   {
-    public PermissionService(IUowProvider uowProvider) : base(uowProvider)
+    private readonly IMapper _mapper;
+    private readonly IAppRoleService _roleService;
+    public PermissionService(IUowProvider uowProvider, IMapper mapper, IAppRoleService roleService ) : base(uowProvider)
     {
+      _mapper = mapper;
+      _roleService = roleService;
     }
 
-    public IEnumerable<Permission> GetByFunctionId(string functionId)
-    {
-      return Repository.Query(x => x.FunctionId == functionId);
+    public async Task<IEnumerable<PermissionViewModel>> GetByFunctionId(string functionId)
+    {      
+      var list = Repository.Query(x => x.FunctionId == functionId);
+      var vList=_mapper.Map<IEnumerable<Permission>, IEnumerable<PermissionViewModel>>(list);
+      foreach (var p in vList)
+      {
+        if (p.AppRole==null)
+        {
+          p.AppRole = await _roleService.Get(p.RoleId);
+        }
+      }
+      return vList;
     }
 
-    public IEnumerable<Permission> GetByRoleIds(List<int> roleIds)
+    public IEnumerable<PermissionViewModel> GetByRoleIds(List<int> roleIds)
     {
-      return Repository.Query(x => roleIds.Contains(x.RoleId));
+      var list = Repository.Query(x => roleIds.Contains(x.RoleId));
+      var vList = _mapper.Map<IEnumerable<Permission>, IEnumerable<PermissionViewModel>>(list);
+      return vList;
     }
 
-    public void Add(Permission permission)
+    public void Add(PermissionViewModel permission)
     {
-      Repository.Add(permission);
-      Save();
+      var db = new Permission();
+      db.UpdatePermission(permission);
+      db.FunctionId = permission.FunctionId;
+      Repository.Add(db);
     }
 
     public void DeleteAll(string functionId)
     {
       Repository.RemoveMulti(x => x.FunctionId == functionId);
+      UnitOfWork.SaveChanges();
     }
 
     public void Save()

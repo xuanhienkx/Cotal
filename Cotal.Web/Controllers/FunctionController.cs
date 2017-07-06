@@ -18,7 +18,7 @@ namespace Cotal.Web.Controllers
     {
       _functionService = functionService;
     }
-                                               
+
 
     [HttpGet("GetAllHierachy")]
     public IActionResult GetAllHierachy()
@@ -35,37 +35,40 @@ namespace Cotal.Web.Controllers
 
       return Ok(functionViewModels);
     }
-
-    // GET: api/values
-    [HttpGet]
-    public IEnumerable<string> Get()
+    [HttpGet("GetAll")]
+    public IActionResult GetAll(string filter = "")
     {
-      return new[] {"value1", "value2"};
+      var model = _functionService.GetAll(filter);
+      return Ok(model);
+    }
+    [HttpGet("Detail/{id}")]
+    public IActionResult Detail(string id)
+    {
+      var function = _functionService.Get(id);
+      return Ok(function);
+    }
+    [HttpPost("Create")]
+    public IActionResult Create(FunctionViewModel model)
+    {
+      if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+      var function = _functionService.Create(model);
+      return Ok(function);
+    }
+    [HttpPut("Update")]
+    public IActionResult Update(FunctionViewModel model)
+    {
+      if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+      var function = _functionService.Create(model);
+      return Ok(function);
+    }
+    [HttpDelete("Delete")]
+    public IActionResult Delete(string id)
+    {
+      _functionService.Delete(id);
+      return Ok();
     }
 
-    // GET api/values/5
-    [HttpGet("{id}")]
-    public string Get(string id)
-    {
-      return "value";
-    }
-
-    // POST api/values
-    [HttpPost]
-    public void Post([FromBody] string value)
-    {
-    }
-
-    // PUT api/values/5
-    [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
-    {
-    }
-
-    // DELETE api/values/5
-    [HttpDelete("{id}")]
-    public void Delete(int id)
-    {
-    }
   }
 }

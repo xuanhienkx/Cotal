@@ -150,7 +150,7 @@ namespace Cotal.App.Business.Infrastructure.Extensions
 
     public static void UpdatePermission(this Permission permission, PermissionViewModel permissionVm)
     {
-      permission.RoleId = permissionVm.RoleId;
+      permission.RoleId = permissionVm.RoleId;  
       permission.FunctionId = permissionVm.FunctionId;
       permission.CanCreate = permissionVm.CanCreate;
       permission.CanDelete = permissionVm.CanDelete;

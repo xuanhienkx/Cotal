@@ -26,19 +26,20 @@ export class UtilityService {
   Unflatten = (arr: any[]): any[] => {
     let map = {};
     let roots: any[] = [];
-    for (var i = 0; i < arr.length; i += 1) {
-      let node = arr[i];
-      node.children = [];
-      map[node.ID] = i; // use map to look-up the parents
-      if (node.ParentId !== null) {
-        arr[map[node.ParentId]].children.push(node);
-      } else {
-        roots.push(node);
-      }
-    }
+    var group = this.groupBy(arr, 'ParentId')
+    let note = group["null"];
+    note.forEach(it => {
+      it.children = group[it.Id]
+      roots.push(it);
+    });
     return roots;
   }
-
+  public groupBy = function (xs, key) {
+    return xs.reduce(function (rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
   Unflatten2 = (arr: any[]): any[] => {
     let map = {};
     let roots: any[] = [];

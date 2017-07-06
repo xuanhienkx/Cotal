@@ -74,6 +74,7 @@ export class UserComponent implements OnInit {
   }
   showAddModal() {
     this.entity = {};
+    this.myRoles=[];
     this.modalAddEdit.show();
   } 
   showEditModal(id: any) {
@@ -99,7 +100,7 @@ export class UserComponent implements OnInit {
       let fi = this.avatar.nativeElement;
       if (fi.files.length > 0) {
         this._uploadService.postWithFile('/api/Upload/SaveImage?type=avatar', null, fi.files)
-          .then((imageUrl: string) => {
+          .then((imageUrl: string) => { 
             this.entity.Avatar = imageUrl;
           }).then(() => {
             this.saveData(form);

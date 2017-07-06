@@ -39,8 +39,7 @@ namespace Cotal.App.Business.Services
       var roles = await _userService.GetRolsByUser(user.Id);
       var roleIds = roles.Select(x => x.Id).ToList();
       var permistion = _permission.GetByRoleIds(roleIds ?? new List<int>());
-      var permistionView =
-        _mapper.Map<IEnumerable<Permission>, IEnumerable<PermissionViewModel>>(permistion ?? new List<Permission>());
+      var permistionView = permistion; 
       var userView = _mapper.Map<AppUser, AppUserViewModel>(user);
       userView.Roles = roles.Select(x => x.Name).ToList();
       userView.RoleIds = roles.Select(x => x.Id).ToList();

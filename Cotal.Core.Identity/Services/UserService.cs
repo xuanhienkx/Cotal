@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Cotal.Core.Identity.Data;
@@ -23,6 +25,7 @@ namespace Cotal.Core.Identity.Services
     Task<bool> Delete(int id);
     Task<IEnumerable<AppRole>> GetRolsByUser(int useId);
     Task<IEnumerable<AppRole>> GetAllRole();
+    Task<IEnumerable<AppRole>> GetAllRole(Expression<Func<AppRole, bool>> expression);
     IEnumerable<AppRole> GetAllRole(int page, int pageSize, out int totalRow, string filter = null);
     Task<AppRole> GetRole(int id);
     Task<AppRole> GetRole(string name);
@@ -66,7 +69,7 @@ namespace Cotal.Core.Identity.Services
 
     public IEnumerable<AppUser> GetAll(int page, int pageSize, out int totalRow, string filter = null)
     {
-      var users = _userManager.Users.Where(x => string.IsNullOrEmpty(filter) || x.UserName.Contains(filter));
+      var users = _userManager.Users.Where(x => string.IsNullOrEmpty(filter) || x.UserName.Contains(filter)|| x.Email.Contains(filter));
       totalRow = users.Count();
       return users.OrderBy(x => x.UserName).Skip((page - 1) * pageSize).Take(pageSize);
     }
@@ -145,9 +148,14 @@ namespace Cotal.Core.Identity.Services
       return await _roleManager.Roles.ToListAsync();
     }
 
+    public async Task<IEnumerable<AppRole>> GetAllRole(Expression<Func<AppRole, bool>> expression)
+    {
+      return await _roleManager.Roles.Where(expression).ToListAsync();
+    }
+
     public IEnumerable<AppRole> GetAllRole(int page, int pageSize, out int totalRow, string filter = null)
     {
-      var roles = _roleManager.Roles.Where(x => string.IsNullOrEmpty(filter) || x.Description.Contains(filter));
+      var roles = _roleManager.Roles.Where(x => string.IsNullOrEmpty(filter) || x.Description.Contains(filter)|| x.Name.Contains(filter));
       totalRow = roles.Count();
       return roles.OrderBy(x => x.Name).Skip((page - 1) * pageSize).Take(pageSize);
     }

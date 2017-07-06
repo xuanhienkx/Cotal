@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Cotal.App.Business.Infrastructure.Extensions;
@@ -12,6 +13,7 @@ namespace Cotal.App.Business.Services
   public interface IAppRoleService
   {
     Task<IEnumerable<AppRoleViewModel>> GetAll();
+    Task<IEnumerable<AppRoleViewModel>> GetAll(Expression<Func<AppRole, bool>> expression);
     IEnumerable<AppRoleViewModel> GetAll(int page, int pageSize, out int totalRow, string filter = null);
     Task<AppRoleViewModel> Get(int id);
     Task<AppRoleViewModel> Get(string name);
@@ -33,6 +35,12 @@ namespace Cotal.App.Business.Services
     public async Task<IEnumerable<AppRoleViewModel>> GetAll()
     {
       var list = await _userService.GetAllRole();
+      return _mapper.Map<IEnumerable<AppRole>, IEnumerable<AppRoleViewModel>>(list ?? new List<AppRole>());
+    }
+
+    public async Task<IEnumerable<AppRoleViewModel>> GetAll(Expression<Func<AppRole, bool>> expression)
+    {
+      var list = await _userService.GetAllRole(expression);
       return _mapper.Map<IEnumerable<AppRole>, IEnumerable<AppRoleViewModel>>(list ?? new List<AppRole>());
     }
 

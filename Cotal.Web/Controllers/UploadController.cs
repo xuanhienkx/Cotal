@@ -29,7 +29,7 @@ namespace Cotal.Web.Controllers
       Dictionary<string, object> dict = new Dictionary<string, object>();
       try
       {
-        var uploads = Path.Combine(_environment.WebRootPath, "UploadedFiles");
+        var uploads = "";
         int flag = 1;
         foreach (var file in files)
         {
@@ -50,35 +50,41 @@ namespace Cotal.Web.Controllers
             switch (type)
             {
               case "avatar":
-                directory = "/Avatars/";
+                directory = "UploadedFiles/Avatars/";
                 break;
               case "product":
-                directory = "/Products/";
+                directory = "UploadedFiles/Products/";
                 break;
               case "news":
-                directory = "/News/";
+                directory = "UploadedFiles/News/";
                 break;
               case "banner":
-                directory = "/Banners/";
+                directory = "UploadedFiles/Banners/";
                 break;
               default:
-                directory = "/";
+                directory = "UploadedFiles/Orther/";
                 break;
             }
-            uploads = Path.Combine(uploads, directory);
+            uploads = Path.Combine(_environment.WebRootPath, directory);
             if (!Directory.Exists(uploads))
             {
               Directory.CreateDirectory(uploads);
             }
-            using (var fileStream = new FileStream(Path.Combine(uploads, file.FileName), FileMode.Create))
+            var fileSave = directory + file.FileName;
+            var pathSave = Path.Combine(_environment.WebRootPath, uploads, file.FileName);
+            using (var fileStream = new FileStream(pathSave, FileMode.Create))
             {
               await file.CopyToAsync(fileStream);
+                                                             
+              dict.Add($"imageUrl_{flag}", $"/{fileSave}");
+             
             }
-            dict.Add($"file_{flag}", file.FileName);
-            flag++;
           }
         }
-        return Ok(dict);    
+        var messageUpload = string.Format("Image Updated Successfully.");
+        dict.Add($"status", $"Ok");
+        dict.Add($"messageUpload", $"{messageUpload}");
+        return Ok(dict);
       }
       catch (Exception ex)
       {

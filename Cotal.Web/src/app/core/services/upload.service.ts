@@ -20,7 +20,7 @@ export class UploadService {
     var returnReponse = new Promise((resolve, reject) => {
       this.dataService.postFile(url, formData).subscribe(
         res => {
-          this.responseData = res;
+          this.responseData = res.imageUrl_1; 
           resolve(this.responseData);
         },
         error => this.dataService.handleError(error)
