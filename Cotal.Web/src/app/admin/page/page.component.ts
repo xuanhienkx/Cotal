@@ -69,7 +69,7 @@ export class PageComponent implements OnInit {
   }
     public delete(id: string) {
     this.notificationService.printConfirmationDialog(MessageContstants.CONFIRM_DELETE_MSG, () => {
-      this._dataService.delete('/api/Page/Delete', 'id', id).subscribe((response: any) => {
+      this._dataService.delete('/api/Page', 'id', id).subscribe((response: any) => {
         this.notificationService.printSuccessMessage(MessageContstants.DELETED_OK_MSG);
         this.search();
       }, error => this._dataService.handleError(error));
@@ -77,7 +77,7 @@ export class PageComponent implements OnInit {
   }
   private saveChange(form: NgForm) {
     if (this.entity.Id == undefined) {
-      this._dataService.post('/api/Page/Created', JSON.stringify(this.entity))
+      this._dataService.post('/api/Page', JSON.stringify(this.entity))
         .subscribe((response: any) => {
           this.reset();
           this.addEditModal.hide(); 
@@ -85,7 +85,7 @@ export class PageComponent implements OnInit {
         }, error => this._dataService.handleError(error));
     }
     else {
-      this._dataService.put('/api/Page/Update', JSON.stringify(this.entity))
+      this._dataService.put('/api/Page', JSON.stringify(this.entity))
         .subscribe((response: any) => {
           this.reset();
           this.addEditModal.hide(); 

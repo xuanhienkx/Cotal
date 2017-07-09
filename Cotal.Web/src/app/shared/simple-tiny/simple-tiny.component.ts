@@ -5,9 +5,9 @@ import { Component, OnDestroy, AfterViewInit, EventEmitter, Input, Output, ViewC
   templateUrl: './simple-tiny.component.html',
   styleUrls: ['./simple-tiny.component.css']
 })
-export class SimpleTinyComponent implements  AfterViewInit, OnDestroy {
+export class SimpleTinyComponent implements AfterViewInit, OnDestroy {
 
- @Input() elementId: String;
+  @Input() elementId: String;
   @Output() onEditorKeyup = new EventEmitter<any>();
   @Input() content: string;
   editor;
@@ -15,9 +15,11 @@ export class SimpleTinyComponent implements  AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     tinymce.baseURL = "/assets/tinymce";
     tinymce.init({
-
+      height: 350,
+      //menubar: false,
+      // theme: 'modern',
       selector: '#' + this.elementId,
-      language: 'vi_VN', 
+      language: 'vi_VN',
       skin_url: '/assets/tinymce/skins/lightgray',
       language_url: '/assets/tinymce/langs/vi_VN.js',
       plugins: "autosave autolink code codesample colorpicker emoticons fullscreen hr image imagetools media preview table textcolor wordcount",
@@ -26,12 +28,13 @@ export class SimpleTinyComponent implements  AfterViewInit, OnDestroy {
         this.editor = editor;
         editor.on('keyup', () => {
           const content = editor.getContent();
+          this.content = content;
           this.onEditorKeyup.emit(content);
         });
         editor.on('init', () => {
           editor.setContent(this.content);
         });
-      }, 
+      },
     });
 
   }

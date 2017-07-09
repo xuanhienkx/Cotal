@@ -21,8 +21,7 @@ export class SidebarMenuComponent implements OnInit {
         else if (n1.DisplayOrder < n2.DisplayOrder)
           return -1;
         return 0;
-      });
-      console.log(this.functions) 
+      }); 
     }, error => this.dataService.handleError(error));
 
   }

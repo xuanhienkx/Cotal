@@ -55,8 +55,8 @@ namespace Cotal.Web.Controllers
     }
 
     // PUT api/values/5
-    [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody]PageViewModel model)
+    [HttpPut]
+    public IActionResult Put([FromBody]PageViewModel model)
     {
         _pageService.Update(model);
       return Ok(JsonConvert.SerializeObject("Update thanh cong"));

@@ -5,6 +5,7 @@ import { HttpModule } from '@angular/http';
 
 import { AppRoutingModule } from './app.routing';
 import { AppComponent } from './app.component';
+//import { SimpleTinyComponent } from "app/shared/simple-tiny/simple-tiny.component";
 
 @NgModule({
   declarations: [

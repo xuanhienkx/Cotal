@@ -8,8 +8,8 @@ import { ModalModule,PaginationModule } from "ngx-bootstrap";
 import { DataService } from "app/core/services/data.service";
 import { UtilityService } from "app/core/services/utility.service";
 import { UploadService } from "app/core/services/upload.service"; 
-import { FormsModule } from "@angular/forms";
-import { SimpleTinyComponent } from "app/shared/simple-tiny/simple-tiny.component"; 
+import { FormsModule } from "@angular/forms"; 
+import { SimpleTinyModule } from "app/shared/simple-tiny/simple-tiny.module";
 const routes: Routes = [
     { path: '', redirectTo: 'index', pathMatch: 'full' },
     { path: 'index', component: PostComponent }
@@ -22,8 +22,9 @@ const routes: Routes = [
     FormsModule,
     ModalModule.forRoot(),
     Daterangepicker,
-    MultiselectDropdownModule
+    MultiselectDropdownModule,
+    SimpleTinyModule//.forRoot()
   ], providers: [DataService, UtilityService, UploadService],
-  declarations: [PostComponent,SimpleTinyComponent]
+  declarations: [PostComponent]
 })
 export class PostModule { }

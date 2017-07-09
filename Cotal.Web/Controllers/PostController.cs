@@ -35,16 +35,7 @@ namespace Cotal.Web.Controllers
                   && (string.IsNullOrEmpty(keyword) || x.Name.Contains(keyword) || x.Content.Contains(keyword))),
                new OrderBy<Post>(p => p.OrderByDescending(o => o.CreatedDate)), posts => posts.Include(c => c.PostCategory));
       return Ok(result);
-      //int totalRow = 0;
-      //var list = _postService.GetAll(page, pageSize, out totalRow, x => categoryId == null || x.CategoryId == categoryId);
-      //var paginationSet = new PaginationSet<PostViewModel>()
-      //{
-      //  Items = list,
-      //  PageIndex = page,
-      //  TotalRows = totalRow,
-      //  PageSize = pageSize
-      //};
-      //return Ok(paginationSet);
+       
     }
     // GET api/values/5
     [HttpGet("Detail/{id}")]

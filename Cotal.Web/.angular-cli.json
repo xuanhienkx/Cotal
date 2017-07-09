@@ -4,8 +4,9 @@
         "name": "cotal.web"
     },
     "apps": [{
+        "name": "admin",
         "root": "src",
-        "outDir": "wwwroot",
+        "outDir": "wwwroot/admin",
         "assets": [
             "assets",
             "favicon.ico"

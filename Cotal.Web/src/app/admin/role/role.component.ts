@@ -35,8 +35,7 @@ loadData() {
   loadRole(id: any) {
     this._dataService.get('/api/Role/Details/' + id)
       .subscribe((response: any) => {
-        this.entity = response;
-        console.log(this.entity);
+        this.entity = response; 
       });
   }
   pageChanged(event: any): void {

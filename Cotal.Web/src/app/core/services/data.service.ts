@@ -29,8 +29,7 @@ export class DataService {
 
     return this._http.get(SystemConstants.BASE_API + uri, this.jwt()).map(this.extractData);
   }
-  post(uri: string, data?: any) {
-    console.log(data);
+  post(uri: string, data?: any) { 
     return this._http.post(SystemConstants.BASE_API + uri, data, this.jwt()).map(this.extractData);
   }
   put(uri: string, data?: any) {

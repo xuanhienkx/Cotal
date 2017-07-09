@@ -6,8 +6,8 @@ import { PaginationModule, ModalModule } from "ngx-bootstrap";
 import { FormsModule } from "@angular/forms/";
 import { DataService } from "app/core/services/data.service";
 import { UtilityService } from "app/core/services/utility.service";
-import { UploadService } from "app/core/services/upload.service"; 
-//import { SimpleTinyComponent } from "app/shared/simple-tiny/simple-tiny.component";
+import { UploadService } from "app/core/services/upload.service";  
+import { SimpleTinyModule } from "app/shared/simple-tiny/simple-tiny.module";
 const routes: Routes = [
     { path: '', redirectTo: 'index', pathMatch: 'full' },
     { path: 'index', component: PageComponent }
@@ -18,8 +18,9 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     PaginationModule.forRoot(),
     FormsModule,
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    SimpleTinyModule//.forRoot()
   ], providers: [DataService, UtilityService, UploadService],
-  declarations: [PageComponent]
+  declarations: [PageComponent] 
 })
 export class PageModule { }
