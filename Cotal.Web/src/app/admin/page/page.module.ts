@@ -1,18 +1,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PostComponent } from './post.component';
+import { PageComponent } from './page.component';
 import { Routes, RouterModule } from "@angular/router";
-import { MultiselectDropdownModule } from "angular-2-dropdown-multiselect";
-import { Daterangepicker } from "ng2-daterangepicker";
-import { ModalModule,PaginationModule } from "ngx-bootstrap";
+import { PaginationModule, ModalModule } from "ngx-bootstrap";
+import { FormsModule } from "@angular/forms/";
 import { DataService } from "app/core/services/data.service";
 import { UtilityService } from "app/core/services/utility.service";
 import { UploadService } from "app/core/services/upload.service"; 
-import { FormsModule } from "@angular/forms";
-import { SimpleTinyComponent } from "app/shared/simple-tiny/simple-tiny.component"; 
+//import { SimpleTinyComponent } from "app/shared/simple-tiny/simple-tiny.component";
 const routes: Routes = [
     { path: '', redirectTo: 'index', pathMatch: 'full' },
-    { path: 'index', component: PostComponent }
+    { path: 'index', component: PageComponent }
 ];
 @NgModule({
   imports: [
@@ -20,10 +18,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     PaginationModule.forRoot(),
     FormsModule,
-    ModalModule.forRoot(),
-    Daterangepicker,
-    MultiselectDropdownModule
+    ModalModule.forRoot()
   ], providers: [DataService, UtilityService, UploadService],
-  declarations: [PostComponent,SimpleTinyComponent]
+  declarations: [PageComponent]
 })
-export class PostModule { }
+export class PageModule { }

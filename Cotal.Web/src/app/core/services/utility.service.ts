@@ -26,6 +26,7 @@ export class UtilityService {
   Unflatten = (arr: any[]): any[] => {
     let map = {};
     let roots: any[] = [];
+    if(arr.length==0) return roots;
     var group = this.groupBy(arr, 'ParentId')
     let note = group["null"];
     note.forEach(it => {
@@ -46,7 +47,7 @@ export class UtilityService {
     for (var i = 0; i < arr.length; i += 1) {
       let node = arr[i];
       node.children = [];
-      map[node.ID] = i; // use map to look-up the parents
+      map[node.Id] = i; // use map to look-up the parents
       if (node.ParentID !== null) {
         arr[map[node.ParentID]].children.push(node);
       } else {

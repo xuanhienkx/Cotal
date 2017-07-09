@@ -12,7 +12,7 @@ namespace Cotal.App.Business.Infrastructure.Extensions
   {
     public static void UpdatePostCategory(this PostCategory postCategory, PostCategoryViewModel postCategoryVm)
     {
-      postCategory.Id = postCategoryVm.ID;
+      postCategory.Id = postCategoryVm.Id;
       postCategory.Name = postCategoryVm.Name;
       postCategory.Description = postCategoryVm.Description;
       postCategory.Alias = postCategoryVm.Alias;
@@ -29,48 +29,62 @@ namespace Cotal.App.Business.Infrastructure.Extensions
       postCategory.MetaDescription = postCategoryVm.MetaDescription;
       postCategory.Status = postCategoryVm.Status;
     }
-/*
-        public static void UpdateProductCategory(this ProductCategory productCategory, ProductCategoryViewModel productCategoryVm)
-        {
-            productCategory.Id = productCategoryVm.ID;
-            productCategory.Name = productCategoryVm.Name;
-            productCategory.Description = productCategoryVm.Description;
-            productCategory.Alias = productCategoryVm.Alias;
-            productCategory.ParentId = productCategoryVm.ParentID;
-            productCategory.DisplayOrder = productCategoryVm.DisplayOrder;
-            productCategory.HomeOrder = productCategoryVm.HomeOrder;
-            productCategory.Image = productCategoryVm.Image;
-            productCategory.HomeFlag = productCategoryVm.HomeFlag;
-            productCategory.HomeOrder = productCategoryVm.HomeOrder;
-            productCategory.CreatedDate = productCategoryVm.CreatedDate;
-            productCategory.CreatedBy = productCategoryVm.CreatedBy;
-            productCategory.UpdatedDate = productCategoryVm.UpdatedDate;
-            productCategory.UpdatedBy = productCategoryVm.UpdatedBy;
-            productCategory.MetaKeyword = productCategoryVm.MetaKeyword;
-            productCategory.MetaDescription = productCategoryVm.MetaDescription;
-            productCategory.Status = productCategoryVm.Status;
-        }*/
+    /*
+            public static void UpdateProductCategory(this ProductCategory productCategory, ProductCategoryViewModel productCategoryVm)
+            {
+                productCategory.Id = productCategoryVm.ID;
+                productCategory.Name = productCategoryVm.Name;
+                productCategory.Description = productCategoryVm.Description;
+                productCategory.Alias = productCategoryVm.Alias;
+                productCategory.ParentId = productCategoryVm.ParentID;
+                productCategory.DisplayOrder = productCategoryVm.DisplayOrder;
+                productCategory.HomeOrder = productCategoryVm.HomeOrder;
+                productCategory.Image = productCategoryVm.Image;
+                productCategory.HomeFlag = productCategoryVm.HomeFlag;
+                productCategory.HomeOrder = productCategoryVm.HomeOrder;
+                productCategory.CreatedDate = productCategoryVm.CreatedDate;
+                productCategory.CreatedBy = productCategoryVm.CreatedBy;
+                productCategory.UpdatedDate = productCategoryVm.UpdatedDate;
+                productCategory.UpdatedBy = productCategoryVm.UpdatedBy;
+                productCategory.MetaKeyword = productCategoryVm.MetaKeyword;
+                productCategory.MetaDescription = productCategoryVm.MetaDescription;
+                productCategory.Status = productCategoryVm.Status;
+            }*/
 
-    //public static void UpdatePost(this Post post, PostViewModel postVm)
-    //{
-    //    post.ID = postVm.ID;
-    //    post.Name = postVm.Name;
-    //    post.Description = postVm.Description;
-    //    post.Alias = postVm.Alias;
-    //    post.CategoryID = postVm.CategoryID;
-    //    post.Content = postVm.Content;
-    //    post.Image = postVm.Image;
-    //    post.HomeFlag = postVm.HomeFlag;
-    //    post.ViewCount = postVm.ViewCount;
+    public static void UpdatePost(this Post post, PostViewModel postVm)
+    {
+      post.Id = postVm.Id;
+      post.Name = postVm.Name;
+      post.Description = postVm.Description;
+      post.Alias = postVm.Alias;
+      post.CategoryId = postVm.CategoryId;
+      post.Content = postVm.Content;
+      post.Image = postVm.Image;
+      post.HomeFlag = postVm.HomeFlag;
+      post.ViewCount = postVm.ViewCount;
 
-    //    post.CreatedDate = postVm.CreatedDate;
-    //    post.CreatedBy = postVm.CreatedBy;
-    //    post.UpdatedDate = postVm.UpdatedDate;
-    //    post.UpdatedBy = postVm.UpdatedBy;
-    //    post.MetaKeyword = postVm.MetaKeyword;
-    //    post.MetaDescription = postVm.MetaDescription;
-    //    post.Status = postVm.Status;
-    //}
+      post.CreatedDate = postVm.CreatedDate;
+      post.CreatedBy = postVm.CreatedBy;
+      post.UpdatedDate = postVm.UpdatedDate;
+      post.UpdatedBy = postVm.UpdatedBy;
+      post.MetaKeyword = postVm.MetaKeyword;
+      post.MetaDescription = postVm.MetaDescription;
+      post.Status = postVm.Status;
+    }
+    public static void UpdatePage(this Page page, PageViewModel pageView)
+    {
+      page.Id = pageView.Id;
+      page.Name = pageView.Name;
+      page.Content = pageView.Content;  
+      page.Status = pageView.Status;
+      page.Alias = pageView.Alias;
+      page.CreatedBy = pageView.CreatedBy;
+      page.CreatedDate = pageView.CreatedDate;
+      page.MetaDescription = pageView.MetaDescription;
+      page.MetaKeyword = pageView.MetaKeyword;
+      page.UpdatedBy = pageView.UpdatedBy;
+      page.UpdatedDate = pageView.UpdatedDate;
+    }
 
     //public static void UpdateProduct(this Product product, ProductViewModel productVm)
     //{

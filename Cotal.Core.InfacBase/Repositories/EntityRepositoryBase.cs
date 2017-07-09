@@ -108,7 +108,7 @@ namespace Cotal.Core.InfacBase.Repositories
         }
 
         public virtual IEnumerable<TEntity> QueryPage(int startRow, int pageLength, Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IQueryable<TEntity>> includes = null)
-        {
+        {                                              
             if (orderBy == null) orderBy = DefaultOrderBy.Expression;   
             var result = QueryDb(filter, orderBy, includes);
             return result.Skip(startRow).Take(pageLength).ToList();

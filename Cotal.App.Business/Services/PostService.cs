@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using AutoMapper;
+using Cotal.App.Business.Infrastructure.Extensions;
+using Cotal.App.Business.ViewModels.Post;
 using Cotal.App.Model.Models;
 using Cotal.Core.InfacBase.Uow;
 using Microsoft.EntityFrameworkCore;
@@ -8,38 +13,47 @@ namespace Cotal.App.Business.Services
 {
   public interface IPostService
   {
-    Post Add(Post post);
+    PostViewModel Add(PostViewModel post);
 
-    void Update(Post post);
+    void Update(PostViewModel post);
 
     void Delete(int id);
 
-    IEnumerable<Post> GetAll();
+    IEnumerable<PostViewModel> GetAll();
+    IEnumerable<PostViewModel> GetAll(int page, int pageSize, out int totalRow, Expression<Func<Post, bool>> fiter = null);
 
-    IEnumerable<Post> GetAllPaging(int page, int pageSize, out int totalRow);
+    IEnumerable<PostViewModel> GetAllPaging(int page, int pageSize, out int totalRow);
 
-    IEnumerable<Post> GetAllByCategoryPaging(int categoryId, int page, int pageSize, out int totalRow);
+    IEnumerable<PostViewModel> GetAllByCategoryPaging(int categoryId, int page, int pageSize, out int totalRow);
 
-    Post GetById(int id);
+    PostViewModel GetById(int id);
 
-    IEnumerable<Post> GetAllByTagPaging(string tag, int page, int pageSize, out int totalRow);
+    IEnumerable<PostViewModel> GetAllByTagPaging(string tag, int page, int pageSize, out int totalRow);
 
     void Save();
   }
 
   public class PostService : ServiceBace<Post, int>, IPostService
   {
-    public PostService(IUowProvider uowProvider) : base(uowProvider)
+    private readonly IMapper _mapper;
+    public PostService(IUowProvider uowProvider, IMapper mapper) : base(uowProvider)
     {
+      _mapper = mapper;
     }
 
-    public Post Add(Post post)
+    public PostViewModel Add(PostViewModel model)
     {
-      return Repository.Add(post);
+      var post = new Post();
+      post.UpdatePost(model);
+      var db = Repository.Add(post);
+      Save();
+      return _mapper.Map<Post, PostViewModel>(db);
     }
 
-    public void Update(Post post)
+    public void Update(PostViewModel model)
     {
+      var post = Repository.Get(model.Id);
+      post.UpdatePost(model);
       Repository.Update(post);
       Save();
     }
@@ -50,35 +64,47 @@ namespace Cotal.App.Business.Services
       Save();
     }
 
-    public IEnumerable<Post> GetAll()
+    public IEnumerable<PostViewModel> GetAll()
     {
-      return Repository.GetAll(x => x.OrderByDescending(p => p.CreatedDate),
+      var list = Repository.GetAll(x => x.OrderByDescending(p => p.CreatedDate),
         posts => posts.Include(p => p.PostCategory));
+      return _mapper.Map<IEnumerable<Post>, IEnumerable<PostViewModel>>(list);
     }
 
-    public IEnumerable<Post> GetAllPaging(int page, int pageSize, out int totalRow)
+    public IEnumerable<PostViewModel> GetAll(int page, int pageSize, out int totalRow, Expression<Func<Post, bool>> fiter = null)
+    {
+      totalRow = Repository.Count(fiter);
+      var list = Repository.QueryPage(page, pageSize, fiter, x=>x.OrderByDescending(p=>p.CreatedDate).ThenBy(xs=>xs.Name));
+      return _mapper.Map<IEnumerable<Post>, IEnumerable<PostViewModel>>(list);
+    }
+
+    public IEnumerable<PostViewModel> GetAllPaging(int page, int pageSize, out int totalRow)
     {
       totalRow = Repository.Count();
-      return Repository.QueryPage(page, pageSize, post => post.Id != 0, null,
+      var list = Repository.QueryPage(page, pageSize, post => post.Id != 0, null,
         posts => posts.Include(p => p.PostCategory)).ToList();
+      return _mapper.Map<IEnumerable<Post>, IEnumerable<PostViewModel>>(list);
     }
 
-    public IEnumerable<Post> GetAllByCategoryPaging(int categoryId, int page, int pageSize, out int totalRow)
+    public IEnumerable<PostViewModel> GetAllByCategoryPaging(int categoryId, int page, int pageSize, out int totalRow)
     {
-      totalRow = Repository.Count();
-      return Repository.QueryPage(page, pageSize, post => post.CategoryId == categoryId, null,
+      totalRow = Repository.Count(post => post.CategoryId == categoryId);
+      var list = Repository.QueryPage(page, pageSize, post => post.CategoryId == categoryId, null,
         posts => posts.Include(p => p.PostCategory)).ToList();
+      return _mapper.Map<IEnumerable<Post>, IEnumerable<PostViewModel>>(list);
     }
 
-    public Post GetById(int id)
+    public PostViewModel GetById(int id)
     {
-      return Repository.Get(id);
+      var db = Repository.Get(id);
+      return _mapper.Map<Post, PostViewModel>(db);
     }
 
-    public IEnumerable<Post> GetAllByTagPaging(string tag, int page, int pageSize, out int totalRow)
+    public IEnumerable<PostViewModel> GetAllByTagPaging(string tag, int page, int pageSize, out int totalRow)
     {
       totalRow = Repository.Count();
-      return Repository.QueryPage(page, pageSize, post => post.PostTags.Any(v => v.TagId == tag)).ToList();
+      var list = Repository.QueryPage(page, pageSize, post => post.PostTags.Any(v => v.TagId == tag)).ToList();
+      return _mapper.Map<IEnumerable<Post>, IEnumerable<PostViewModel>>(list);
     }
 
     public void Save()

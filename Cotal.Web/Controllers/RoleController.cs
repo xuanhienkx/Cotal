@@ -90,8 +90,7 @@ namespace Cotal.Web.Controllers
     public async Task<IActionResult> GetAllPermission(string functionId)
     {
       List<PermissionViewModel> listPermission = new List<PermissionViewModel>();
-      var list = await _permissionService.GetByFunctionId(functionId);
-
+      var list = await _permissionService.GetByFunctionId(functionId);   
       var vList = list as IList<PermissionViewModel> ?? list.ToList();
       if (!vList.Any())
       {

@@ -11,6 +11,9 @@ export const adminRouting: Routes = [
             { path: 'user', loadChildren: './user/user.module#UserModule' },
             { path: 'role', loadChildren: './role/role.module#RoleModule' },
             { path: 'function', loadChildren: './function/function.module#FunctionModule' },
+            { path: 'post-category', loadChildren: './post-category/post-category.module#PostCategoryModule' },
+             { path: 'post', loadChildren: './post/post.module#PostModule' },
+             { path: 'page', loadChildren: './page/page.module#PageModule' }
         ]
     }
 ];
