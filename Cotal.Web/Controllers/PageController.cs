@@ -1,4 +1,5 @@
-﻿using Cotal.App.Business.Services;
+﻿using System;
+using Cotal.App.Business.Services;
 using Cotal.App.Business.ViewModels.Post;
 using Cotal.App.Model.Models;
 using Cotal.Core.InfacBase.Paging;
@@ -50,6 +51,8 @@ namespace Cotal.Web.Controllers
     [HttpPost]
     public IActionResult Post([FromBody]PageViewModel model)
     {
+      model.CreatedDate= DateTime.Now;
+      model.CreatedBy = CurrentUser.UserName;
       var db = _pageService.Create(model);
       return Ok(db);
     }
@@ -58,6 +61,9 @@ namespace Cotal.Web.Controllers
     [HttpPut]
     public IActionResult Put([FromBody]PageViewModel model)
     {
+
+      model.UpdatedDate = DateTime.Now;
+      model.UpdatedBy = CurrentUser.UserName;
         _pageService.Update(model);
       return Ok(JsonConvert.SerializeObject("Update thanh cong"));
     }

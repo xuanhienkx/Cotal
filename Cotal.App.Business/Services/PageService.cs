@@ -67,7 +67,9 @@ namespace Cotal.App.Business.Services
 
     public void Update(PageViewModel page)
     {
-      var model = new Page();
+      var model = Repository.Get(page.Id);  
+      page.CreatedDate = DateTime.Now;
+      page.CreatedBy = model.CreatedBy;
       model.UpdatePage(page);
       var db = Repository.Update(model);
       //return _mapper.Map<Page, PageViewModel>(db); 
