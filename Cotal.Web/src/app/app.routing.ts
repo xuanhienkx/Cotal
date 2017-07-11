@@ -8,7 +8,8 @@ const routes: Routes = [
   //   children: []
   // }
   //localhost:4200
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    { path: '', redirectTo: 'main', pathMatch: 'full' },
+    { path: 'main', loadChildren: './main/main.module#MainModule' },
     //localhost:4200/login
     { path: 'login', loadChildren: './login/login.module#LoginModule' },
     //localhost:4200/main

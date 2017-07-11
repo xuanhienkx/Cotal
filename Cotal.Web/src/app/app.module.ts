@@ -5,6 +5,7 @@ import { HttpModule } from '@angular/http';
 
 import { AppRoutingModule } from './app.routing';
 import { AppComponent } from './app.component';
+import { AuthGuard } from "app/core/guards/auth.guard";
 //import { SimpleTinyComponent } from "app/shared/simple-tiny/simple-tiny.component";
 
 @NgModule({
@@ -17,7 +18,7 @@ import { AppComponent } from './app.component';
     HttpModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,7 +1,7 @@
 ﻿import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminComponent } from './admin.component';
-import { AdminRoutingModule } from "app/admin/admin.routung";
+import { AdminRoutingModule } from "app/admin/admin.routing";
 import { SidebarMenuComponent } from "app/shared/sidebar-menu/sidebar-menu.component";  
 import { TopMenuComponent } from "app/shared/top-menu/top-menu.component";     
 

@@ -6,7 +6,7 @@
     "apps": [{
         "name": "admin",
         "root": "src",
-        "outDir": "wwwroot/admin",
+        "outDir": "wwwroot",
         "assets": [
             "assets",
             "favicon.ico"
