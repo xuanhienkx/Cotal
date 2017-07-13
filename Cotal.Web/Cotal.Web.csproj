@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>                 
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <PostBuildEvent>ng build --aot</PostBuildEvent>
+    <PostBuildEvent>ng build --prod --aot true</PostBuildEvent>
     <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>    
   </PropertyGroup>
 
